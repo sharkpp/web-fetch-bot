@@ -1,6 +1,7 @@
 # buildin pacakges
 import re
 # 3rd party packages
+import yaml
 # my pacakges
 from action import BuildinActionKey
 
@@ -14,12 +15,14 @@ class Context:
   result_vars = None
   action_cmds = None
   registerd_action_list = None
+  state = None
 
   def __init__(self, action_cmds):
     self.vars = {}
     self.result_vars = {}
     self.action_cmds = action_cmds
     self.registerd_action_list = set(action_cmds.keys())
+    self.state = {}
 
   # 一時変数をクリア
   def reset_vars(self):
@@ -98,4 +101,28 @@ class Context:
       if BuildinActionKey.SET.value in action:
         self.register_vars(action[BuildinActionKey.SET.value])
 
-      #print("<<ctx.vars",self.vars.keys())
+  def read_state(self, fname):
+    cur_state = set()
+    if fname in self.state:
+      cur_state = self.state[fname]
+    else:
+      cur_state = self.state[fname] = set()
+      try:
+        with open(fname, mode="r") as file:
+          state_raw = yaml.safe_load(file)
+          if 1 == state_raw.state.version:
+            cur_state = self.state[fname] = set(state_raw.state.done)
+      except Exception as e:
+        return cur_state
+    return cur_state
+
+  def save_state(self):
+    for fname, state in self.state.items():
+      with open(fname, mode="w") as f:
+        f.write(yaml.dump({
+          "state": {
+            "version": 1,
+            "done": list(state)
+          }
+        }))
+

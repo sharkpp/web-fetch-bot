@@ -49,5 +49,8 @@ for url in args.urls:
       # レシピ内のアクションを順に処理
       ctx._exec_actions(recipe.actions)
 
+      # 状態を保存
+      ctx.save_state()
+
     except Exception as e:
       print(name, e)  
