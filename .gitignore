@@ -1,0 +1,10 @@
+# misc
+/recipes/**/*.yaml
+/.*
+
+# macOS
+.DS_Store
+
+# python
+__pycache__
+/.venv
