@@ -1,7 +1,5 @@
 # buildin pacakges
 from os import makedirs, path
-# 3rd party packages
-# my pacakges
 
 """
 actions:
