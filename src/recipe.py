@@ -35,7 +35,7 @@ def load_recipes(base_dir):
         continue
       name = path.splitext(entry.name)[0]
       try:
-        with open(path.join(recipes_dir, entry.name)) as file:
+        with open(path.join(recipes_dir, entry.name), mode="r") as file:
           recipes[name] = Recipe(yaml.safe_load(file))
       except Exception as e:
         print(entry.name, e)
