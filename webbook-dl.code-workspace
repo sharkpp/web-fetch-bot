@@ -7,5 +7,26 @@
 	"settings": {
 		"editor.tabSize": 2,
 		"editor.renderWhitespace": "trailing"
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "debug run",
+				"type": "python",
+				"request": "launch",
+				"program": "src/main.py",
+				"console": "integratedTerminal",
+				"justMyCode": true,
+				"args": ["${input:urlString}"]
+			}
+		],
+		"inputs": [
+			{
+					"id": "urlString",
+					"type": "promptString",
+					"description": "URLを入力",
+			}
+		]
 	}
 }
