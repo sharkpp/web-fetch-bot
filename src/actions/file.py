@@ -1,11 +1,14 @@
 # buildin pacakges
-from os import makedirs, path
+from os import makedirs, path, stat, utime
+from datetime import timezone
+
 
 """
 actions:
   - name: "hoge write"
     file.write:
       dest: hoge.txt
+      timestamp: $HOGE
       contents: 
         hoge $FUGA
   - name: "hoge write"
@@ -27,8 +30,12 @@ actions:
 
 def _file_write(ctx, params):
   #print("_file_write",params["contents"])
+  if "dest" not in params \
+      or "contents" not in params:
+    return False
   dest = ctx.apply_vars(params["dest"])
   contents = ctx.apply_vars(params["contents"])
+  timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
   base_dir = path.dirname(dest)
   #保存したいけどどこかでエラーで止まる
   #print("_file_write",base_dir)
@@ -36,6 +43,10 @@ def _file_write(ctx, params):
     makedirs(base_dir)
   with open(dest, mode="w" if "str" == type(contents) else "wb") as f:
       f.write(contents)
+  if timestamp is not None:
+    # ファイルのタイムスタンプを指定のものに変更
+    sr = stat(path=dest)
+    utime(path=dest, times=(sr.st_atime, timestamp.timestamp()))
   return True
 
 def _file_read(ctx, params):

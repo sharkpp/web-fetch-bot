@@ -1,5 +1,6 @@
 # buildin pacakges
 import re
+from datetime import datetime
 # 3rd party packages
 import requests
 # my pacakges
@@ -27,6 +28,10 @@ actions:
       RES: ${res.body}
       RES_TYPE: ${res.headers.content-type}
 """
+
+HEADER_CONTENT_TYPE = "Content-Type"
+HEADER_LAST_MODIFIED = "Last-Modified"
+HEADER_DATE = "Date"
 
 url_match = re.compile("^((GET|POST)\s+)?(https?:\/\/.+)$")
 
@@ -58,8 +63,8 @@ def _url(ctx, params):
     return False
 
   if encoding is None:
-    if "Content-Type" in response.headers:
-      m = re.search(r"^(text\/[a-zA-Z0-9.-]+|application\/json)(; *charset\s*=\s*([^;\s]+|.+$))?", response.headers["Content-Type"])
+    if HEADER_CONTENT_TYPE in response.headers:
+      m = re.search(r"^(text\/[a-zA-Z0-9.-]+|application\/json)(; *charset\s*=\s*([^;\s]+|.+$))?", response.headers[HEADER_CONTENT_TYPE])
       if m is not None:
         encoding = m.group(3) if m.group(3) is not None else "utf-8"
       else:
@@ -67,6 +72,20 @@ def _url(ctx, params):
 
   #print(response.status_code)    # HTTPのステータスコード取得
   #print(response.text)    # レスポンスのHTMLを文字列で取得
+  #print(response.headers)
+
+  # Last-Modified: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT
+  # >> https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Last-Modified
+  content_last_modified_date = \
+    datetime.strptime(response.headers[HEADER_LAST_MODIFIED], "%a, %d %b %Y %H:%M:%S %Z") \
+      if HEADER_LAST_MODIFIED in response.headers \
+      else None
+#  # Date: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT
+#  # >> https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Date
+#  content_date = \
+#    datetime.strptime(response.headers[HEADER_LAST_MODIFIED], "%a, %d %b %Y %H:%M:%S %Z") \
+#      if HEADER_LAST_MODIFIED in response.headers \
+#      else None
 
   body = response.text
   if encoding is not None:
@@ -76,7 +95,8 @@ def _url(ctx, params):
       body = response.content.decode(encoding)
 
   ctx.result_vars["res"] = {
-    "body": body
+    "body": body,
+    "timestamp": content_last_modified_date
   }
 
   return True
