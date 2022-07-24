@@ -96,7 +96,7 @@ def _url(ctx, params):
 
   ctx.result_vars["res"] = {
     "body": body,
-    "timestamp": content_last_modified_date
+    "timestamp": content_last_modified_date # GMT
   }
 
   return True
