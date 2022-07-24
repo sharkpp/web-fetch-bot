@@ -35,7 +35,6 @@ state.yaml file format
 DEFAULT_STATE_FILENAME = "state.yaml"
 
 def get_state_params(ctx, params):
-  x = type(params)
   if isinstance(params, str):
     key = ctx.apply_vars(params)
     state_path = path.join(ctx.vars["BASE_DIR"], DEFAULT_STATE_FILENAME)

@@ -24,24 +24,30 @@ class Context:
     self.registerd_action_list = set(action_cmds.keys())
     self.state = {}
 
-  # 一時変数をクリア
   def reset_vars(self):
+    """
+    一時変数をクリア
+    """
     self.result_vars = {}
 
-  # 変数を登録
   def register_vars(self, vars_list):
+    """
+    変数を登録
+    """
     #print(vars_list.keys())
     for name, s in vars_list.items():
       self.vars[name] = self._apply_vars(self.result_vars, s)
 
-  # 変数を展開
   def apply_vars(self, s):
+    """
+    変数を展開
+    """
     return self._apply_vars(self.vars, s)
 
   def _apply_vars(self, var_list, s):
-    #if "INDEX_BODY" in self.vars:
-    #  del self.vars["INDEX_BODY"]
-    #print("_apply_vars",var_list,s)
+    """
+    変数を置き換え
+    """
     r = s
     pos_offset = 0
     for m in re.finditer(r"\$(\{([0-9a-zA-Z_.-]+)\}|([0-9a-zA-Z_.-]+))", s, re.MULTILINE):
@@ -53,19 +59,18 @@ class Context:
         else:
           var_value = ""
           break
-      #print("_apply_vars",var_value)
       if 0 == m.start(0) and len(s) == m.end(0):
-        #print("@@@@",var_list.keys())
-        #print("@@@@",s,var_name,type(var_value),r)
         # １つの変数のみを指定している場合はそのまま埋め込む
         r = var_value
         break
       r = r[:m.start(0)+pos_offset] + var_value + r[m.end(0)+pos_offset:]
       pos_offset += len(var_value) - (m.end(0) - m.start(0))
-    #print("_apply_vars @",r)
     return r
 
   def _exec_actions(self, actions):
+    """
+    アクションを実行
+    """
     for action in actions:
       # アクションを取得
       action_type = None
@@ -82,26 +87,26 @@ class Context:
 
       self.reset_vars()
 
-      #print(">>ctx.vars",self.vars.keys())
-      #print(">>",self.result_vars.keys())
-      #print("action[BUILDIN_KEY_SET]",action)
-
+      # アクション実行
       if action_type is None:
         continue
-
-      # アクション実行
-      print(">>",self.action_cmds[action_type])
       action_fn = self.action_cmds[action_type]
-      print("action_fn",action_fn)
-      action_fn(self, action[action_type])
+      action_success = action_fn(self, action[action_type])
+      #print(">>>",action_type,action_success)
+      if not action_success:
+        # アクションの実行に失敗
+        if "skip" != action_type:
+          print("{} fail".format(action_type))
+        break
 
-      #print("<<ctx.vars",self.vars.keys())
-      #print("<<ctx.vars")
-
+      # 変数を作成
       if BuildinActionKey.SET.value in action:
         self.register_vars(action[BuildinActionKey.SET.value])
 
   def read_state(self, fname):
+    """
+    DL状態を読み込み
+    """
     cur_state = set()
     if fname in self.state:
       cur_state = self.state[fname]
@@ -110,13 +115,16 @@ class Context:
       try:
         with open(fname, mode="r") as file:
           state_raw = yaml.safe_load(file)
-          if 1 == state_raw.state.version:
-            cur_state = self.state[fname] = set(state_raw.state.done)
+          if 1 == state_raw["state"]["version"]:
+            cur_state = self.state[fname] = set(state_raw["state"]["done"])
       except Exception as e:
         return cur_state
     return cur_state
 
   def save_state(self):
+    """
+    DL状態を保存
+    """
     for fname, state in self.state.items():
       with open(fname, mode="w") as f:
         f.write(yaml.dump({
