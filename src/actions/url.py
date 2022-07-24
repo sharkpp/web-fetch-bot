@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 # 3rd party packages
 import requests
+from requests.exceptions import Timeout
 # my pacakges
 
 """
@@ -28,6 +29,9 @@ actions:
       RES: ${res.body}
       RES_TYPE: ${res.headers.content-type}
 """
+
+REQUEST_CONNECT_TIMEOUT = 10
+REQUEST_RECV_TIMEOUT = 60
 
 HEADER_CONTENT_TYPE = "Content-Type"
 HEADER_LAST_MODIFIED = "Last-Modified"
@@ -55,7 +59,15 @@ def _url(ctx, params):
   #print("_url",method,url,encoding)
 
   if "GET" == method:
-    response = requests.get(url)
+    try:
+      response = requests.get(\
+        url, \
+        timeout=(REQUEST_CONNECT_TIMEOUT, \
+                  REQUEST_RECV_TIMEOUT)\
+      )
+    except Timeout:
+      print("url", url, "timeout")
+      return False
   else:
     return False
 
