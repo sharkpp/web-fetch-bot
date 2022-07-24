@@ -33,7 +33,7 @@ args = parser.parse_args()
 
 # 指定された Url を順に処理
 for url in args.urls:
-  print("{} ------".format(url))
+  #print("{} ------".format(url))
   # Url にマッチするレシピを探して処理
   for name, recipe in recipes.items():
     ctx = Context(actions_cmds)

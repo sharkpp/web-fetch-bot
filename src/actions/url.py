@@ -47,7 +47,7 @@ def _url(ctx, params):
     print("_url",e)
     return False
 
-  print("_url",method,url,encoding)
+  #print("_url",method,url,encoding)
 
   if "GET" == method:
     response = requests.get(url)
@@ -68,7 +68,6 @@ def _url(ctx, params):
   #print(response.status_code)    # HTTPのステータスコード取得
   #print(response.text)    # レスポンスのHTMLを文字列で取得
 
-  print(url,encoding)
   body = response.text
   if encoding is not None:
     if "binary" == encoding:
@@ -79,8 +78,6 @@ def _url(ctx, params):
   ctx.result_vars["res"] = {
     "body": body
   }
-
-  #print("@>>",ctx.result_vars)
 
   return True
 

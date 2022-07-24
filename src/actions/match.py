@@ -39,7 +39,6 @@ def _match(ctx, params):
       match[k] = ctx._apply_vars(matches_groups, v)
     matches.append(match)
   ctx.result_vars["matches"] = matches
-  print("++",matches)
   return True
 
 def get_actions():
