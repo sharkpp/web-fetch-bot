@@ -2,20 +2,19 @@
 """
 actions:
   - name: "add "
-    action: let
     let:
       LIST:
         - 10
         - 20
   - name: "hoge download, simple"
-    action: foreach
-    let: I
-    in: LIST
-    loop:
-      - name: "hoge download, simple"
-        action: web_read
-        params:
-          target: https://example.net/hoge/$I
+    foreach:
+      let: I
+      in: LIST
+      loop:
+        - name: "hoge download, simple"
+          action: web_read
+          params:
+            target: https://example.net/hoge/$I
 """
 
 def _let(ctx, params):
