@@ -15,9 +15,10 @@
 				"name": "debug run",
 				"type": "python",
 				"request": "launch",
-				"program": "src/main.py",
+				"program": "${workspaceFolder}/src/main.py",
 				"console": "integratedTerminal",
 				"justMyCode": true,
+				"cwd": "${input:cwd}",
 				"args": ["${input:urlString}"]
 			}
 		],
@@ -26,6 +27,12 @@
 					"id": "urlString",
 					"type": "promptString",
 					"description": "URLを入力",
+			},
+			{
+					"id": "cwd",
+					"type": "promptString",
+					"description": "作業ディレクトリを入力",
+					"default": "${workspaceFolder}"
 			}
 		]
 	}
