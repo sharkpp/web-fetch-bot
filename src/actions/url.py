@@ -1,5 +1,6 @@
 # buildin pacakges
 import re
+from urllib.parse import urljoin
 from datetime import datetime
 # 3rd party packages
 import requests
@@ -51,6 +52,9 @@ def _url(ctx, params):
     else:
       method = params["method"].upper() if "method" in params else "GET"
       url = ctx.apply_vars(params["url"])
+      base_url = ctx.apply_vars(params["base_url"]) if "base_url" in params else None
+      if base_url is not None:
+        url = urljoin(base_url, url)
       encoding = params["encoding"] if "encoding" in params else None
   except Exception as e:
     print("_url",e)
