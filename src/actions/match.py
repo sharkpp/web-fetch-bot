@@ -20,6 +20,7 @@ def _match(ctx, params):
   pattern = params["pattern"]
   flags_ = params["flags"]
   out = params["out"]
+  match_all = params["match_all"] if "match_all" in params else True
   # フラグを構築
   flags = re.MULTILINE
   if 0 < flags_.find("i"):
@@ -38,7 +39,10 @@ def _match(ctx, params):
     for k, v in out.items():
       match[k] = ctx._apply_vars(matches_groups, v)
     matches.append(match)
-  ctx.result_vars["matches"] = matches
+  if match_all:
+    ctx.result_vars["matches"] = matches
+  else:
+    ctx.result_vars["match"] = matches[0] if 0 < len(matches) else {}
   return True
 
 def get_actions():
