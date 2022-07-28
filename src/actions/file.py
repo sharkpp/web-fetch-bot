@@ -34,6 +34,14 @@ def _file_write(ctx, params):
       or "contents" not in params:
     return False
   dest = ctx.apply_vars(params["dest"])
+  dest = dest\
+    .replace('"', "") \
+    .replace("\\", "￥") \
+    .replace(':', "：") \
+    .replace('?', "？") \
+    .replace('*', "＊") \
+    .replace('<', "＜").replace('>', "＞") \
+    .replace('|', "｜")
   contents = ctx.apply_vars(params["contents"])
   timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
   base_dir = path.dirname(dest)
