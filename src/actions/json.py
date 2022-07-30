@@ -41,22 +41,24 @@ class JsonFormatType(Enum):
   JSONC = "jsonc"
   JS = "js"
 
-def _json_load(ctx, params):
+def _json_parse(ctx, params):
   try:
     in_str = ctx.apply_vars(params["in"])
     out_var = params["out"]
     format = params["format"] if "format" in params else JsonFormatType.JSON.value()
-    if JsonFormatType.JSONC.value() == format:
+    if JsonFormatType.JSONC.value == format:
       # /* .. */ や // を削除する
       in_str = re.sub(r'/\*[\s\S]*?\*/|//.*', '', in_str)
       ctx.vars[out_var] = json.loads(in_str)
-    elif JsonFormatType.JS.value() == format:
-      ctx.vars[out_var] = jsToDict(in_str)
+    elif JsonFormatType.JS.value == format:
+      r = parse("const x = " + in_str)
+      r = r["body"][0]["declarations"][0]["init"]
+      ctx.vars[out_var] = jsToDict(r)
     else:
       ctx.vars[out_var] = json.loads(in_str)
     # フラグを構築
   except Exception as e:
-    print("_json_load", e)
+    print("_json_parse", e)
     return False
   return True
 
@@ -65,5 +67,5 @@ def get_actions():
   Returns a list of the actions it is providing
   """
   return {
-    "json.load": _json_load,
+    "json.parse": _json_parse,
   }
