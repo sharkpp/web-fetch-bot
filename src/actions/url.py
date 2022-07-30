@@ -84,7 +84,7 @@ def _url(ctx, params):
       if m is not None:
         encoding = m.group(3) if m.group(3) is not None else "utf-8"
       else:
-        encoding = None
+        encoding = "binary"
 
   #print(response.status_code)    # HTTPのステータスコード取得
   #print(response.text)    # レスポンスのHTMLを文字列で取得
