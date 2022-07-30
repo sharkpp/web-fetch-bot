@@ -1,5 +1,7 @@
 # buildin pacakges
 import re
+# my pacakges
+from libraries.format import format
 
 """
 actions:
@@ -10,7 +12,13 @@ actions:
       old: /pet (store)/
       new: dog ${1}
     # "hoge pet store in" -> "hoge dog store in"
+  - name:
+    format:
+      in: $I
+      out: PAGE_FILENAME
+      format: "000'.jpg'"
 """
+
 
 def _replace(ctx, params):
   try:
@@ -41,10 +49,23 @@ def _replace(ctx, params):
     return False
   return True
 
+def _format(ctx, params):
+  # https://docs.microsoft.com/ja-jp/office/vba/language/reference/user-interface-help/format-function-visual-basic-for-applications
+  try:
+    in_str = ctx.apply_vars(params["in"])
+    out_var = params["out"]
+    format_ = params["format"]
+    ctx.vars[out_var] = format(format_, in_str)
+  except Exception as e:
+    print("_for", e)
+    return False
+  return True
+
 def get_actions():
   """
   Returns a list of the actions it is providing
   """
   return {
     "replace": _replace,
+    "format": _format,
   }
