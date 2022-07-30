@@ -20,6 +20,15 @@
 				"justMyCode": true,
 				"cwd": "${input:cwd}",
 				"args": ["${input:urlString}"]
+			},
+			{
+				"name": "debug current file",
+				"type": "python",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"justMyCode": true,
+				"cwd": "${fileDirname}"
 			}
 		],
 		"inputs": [
