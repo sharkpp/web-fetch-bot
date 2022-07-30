@@ -15,7 +15,7 @@ actions:
 def _replace(ctx, params):
   try:
     in_str = ctx.apply_vars(params["in"])
-    out_var = ctx.apply_vars(params["out"])
+    out_var = params["out"]
     flags_ = params["flags"] if "flags" in params else ""
     old_str = params["old"]
     old_re = params["old"].strip("/")
