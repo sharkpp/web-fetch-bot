@@ -49,7 +49,7 @@ def _file_write(ctx, params):
   #print("_file_write",base_dir)
   if not path.exists(base_dir):
     makedirs(base_dir)
-  with open(dest, mode="w" if "str" == type(contents) else "wb") as f:
+  with open(dest, mode="w" if str == type(contents) else "wb") as f:
       f.write(contents)
   if timestamp is not None:
     # ファイルのタイムスタンプを指定のものに変更
