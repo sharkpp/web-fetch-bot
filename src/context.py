@@ -48,6 +48,8 @@ class Context:
     """
     変数を置き換え
     """
+    if type(s) != str:
+      return s
     r = s
     pos_offset = 0
     for m in re.finditer(r"\$(\{([0-9a-zA-Z_.-]+)\}|([0-9a-zA-Z_.-]+))", s, re.MULTILINE):
@@ -63,8 +65,8 @@ class Context:
         # １つの変数のみを指定している場合はそのまま埋め込む
         r = var_value
         break
-      r = r[:m.start(0)+pos_offset] + var_value + r[m.end(0)+pos_offset:]
-      pos_offset += len(var_value) - (m.end(0) - m.start(0))
+      r = r[:m.start(0)+pos_offset] + str(var_value) + r[m.end(0)+pos_offset:]
+      pos_offset += len(str(var_value)) - (m.end(0) - m.start(0))
     return r
 
   def _exec_actions(self, actions):
