@@ -28,7 +28,7 @@ actions:
 
 def _let(ctx, params):
   for k, v in params.items():
-    ctx.vars[k] = v
+    ctx.vars[k] = ctx.apply_vars(v)
   return True
 
 def _foreach(ctx, params):
@@ -53,7 +53,6 @@ def _for(ctx, params):
     let_var = params["let"]
     do_actions = params["do"]
     for i in range(start_num, end_num + 1, step_num):
-      print("i",i)
       ctx.vars[let_var] = i
       ctx._exec_actions(do_actions)
       del ctx.vars[let_var]
