@@ -2,6 +2,8 @@
 from os import makedirs, path, stat, utime
 from datetime import datetime, timezone, timedelta
 from sys import version_info
+# my pacakges
+from libraries.file_util import touch_file
 
 """
 actions:
@@ -53,16 +55,7 @@ def _file_write(ctx, params):
       f.write(contents)
   if timestamp is not None:
     # ファイルのタイムスタンプを指定のものに変更
-    sr = stat(path=dest)
-
-    if 3 < version_info.major or \
-        (3 == version_info.major and 6 <= version_info.minor):
-      local_tz = datetime.now(timezone.utc).astimezone().tzinfo
-    else:
-      local_tz = datetime.now(timezone(timedelta(0))).astimezone().tzinfo
-
-    utime(path=dest, times=(sr.st_atime, \
-      (timestamp + timestamp.astimezone(local_tz).utcoffset()).timestamp()))
+    touch_file(dest, timestamp)
   return True
 
 def _file_read(ctx, params):
