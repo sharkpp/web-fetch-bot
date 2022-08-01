@@ -7,6 +7,8 @@ from os import path
 from context import Context
 from action import load_actions
 from recipe import load_recipes
+from libraries.exceptions import QuitActionException, AbortActionException
+
 
 """
 webbook-dl main
@@ -51,6 +53,21 @@ for url in args.urls:
 
       # 状態を保存
       ctx.save_state()
+
+      # 一時ファイルをクリーン
+      ctx.temporaries_cleanup()
+
+    except QuitActionException as e:
+      # 状態を保存
+      ctx.save_state()
+      # 一時ファイルをクリーン
+      ctx.temporaries_cleanup()
+      # 指示された場所で終了
+      sys.exit()
+
+    except AbortActionException as e:
+      # 中断
+      sys.exit()
 
     except Exception as e:
       print(name, e)  

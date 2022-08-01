@@ -46,6 +46,7 @@ def _file_write(ctx, params):
     .replace('|', "｜")
   contents = ctx.apply_vars(params["contents"])
   timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
+  is_temporary = True if "temporary" in params and True == params["temporary"] else False
   base_dir = path.dirname(dest)
   #保存したいけどどこかでエラーで止まる
   #print("_file_write",base_dir)
@@ -56,6 +57,8 @@ def _file_write(ctx, params):
   if timestamp is not None:
     # ファイルのタイムスタンプを指定のものに変更
     touch_file(dest, timestamp)
+  if is_temporary:
+    ctx.temporaries.add(dest)
   return True
 
 def _file_read(ctx, params):

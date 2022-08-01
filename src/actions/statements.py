@@ -1,5 +1,7 @@
 # buildin pacakges
 import sys
+# my pacakges
+from libraries.exceptions import ActionException, QuitActionException, AbortActionException
 
 """
 actions:
@@ -40,6 +42,8 @@ def _foreach(ctx, params):
       ctx.vars[let_var] = v
       ctx._exec_actions(do_actions)
       del ctx.vars[let_var]
+  except ActionException as e:
+    raise
   except Exception as e:
     print("_foreach", e)      
     return False
@@ -56,14 +60,18 @@ def _for(ctx, params):
       ctx.vars[let_var] = i
       ctx._exec_actions(do_actions)
       del ctx.vars[let_var]
+  except ActionException as e:
+    raise
   except Exception as e:
     print("_for", e)      
     return False
   return True
 
 def _abort(ctx, params):
-  sys.exit()
-  return True
+  raise AbortActionException()
+
+def _quit(ctx, params):
+  raise QuitActionException()
 
 def get_actions():
   """
@@ -74,4 +82,5 @@ def get_actions():
     "foreach": _foreach,
     "for": _for,
     "abort": _abort,
+    "quit": _quit,
   }

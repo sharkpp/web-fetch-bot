@@ -1,5 +1,7 @@
 # buildin pacakges
 import re
+import os
+from os import path
 # 3rd party packages
 import yaml
 # my pacakges
@@ -16,6 +18,7 @@ class Context:
   action_cmds = None
   registerd_action_list = None
   state = None
+  temporaries = None
 
   def __init__(self, action_cmds):
     self.vars = {}
@@ -23,6 +26,24 @@ class Context:
     self.action_cmds = action_cmds
     self.registerd_action_list = set(action_cmds.keys())
     self.state = {}
+    self.temporaries = set()
+
+  # 一時利用とマークしたファイルを削除
+  def temporaries_cleanup(self):
+    base_dirs = set()
+    for temporary_path in self.temporaries:
+      try:
+        os.remove(temporary_path)
+        base_dirs.add(path.dirname(temporary_path))
+      except OSError as e:
+        pass
+    for base_dir in base_dirs:
+      try:
+        os.rmdir(base_dir)
+      except OSError as e:
+        # 空っぽでなければ削除はされない
+        pass
+    self.temporaries = set()
 
   def reset_vars(self):
     """
