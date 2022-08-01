@@ -1,5 +1,5 @@
 # buildin pacakges
-from os import scandir, path
+from os import walk, path
 import re
 # 3rd party packages
 import yaml
@@ -26,17 +26,16 @@ class Recipe:
 def load_recipes(base_dir):
   recipes = {}
   # load recipes
-  recipes_dir = path.join(base_dir, "recipes")
-  with scandir(recipes_dir) as it:
-    for entry in it:
-      if not entry.is_file():
+  base_dir_ = path.join(base_dir, "recipes")
+  for root, dirs, files in walk(base_dir_):
+    for entry in files:
+      if re.fullmatch("^.+\.yaml$", entry) is None:
         continue
-      if re.fullmatch("^.+\.yaml$", entry.name) is None:
-        continue
-      name = path.splitext(entry.name)[0]
+      name = path.splitext(entry)[0]
       try:
-        with open(path.join(recipes_dir, entry.name), mode="r") as file:
+        with open(path.join(root, entry), mode="r") as file:
           recipes[name] = Recipe(yaml.safe_load(file))
       except Exception as e:
-        print(entry.name, e)
+        print(entry, e)
+
   return recipes
