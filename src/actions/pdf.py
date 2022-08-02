@@ -32,15 +32,19 @@ def _pdf_from_dir(ctx, params):
       pageCompression=1 \
     )
     # フォルダ内の画像からPDFを生成
+    page_list = []
     with scandir(in_dir) as it:
       for entry in it:
         if entry.is_file() and \
             re.search(r"\.(png|jpg|jpeg|gif)$", entry.name) is not None:
-          try:
-            page.drawImage(entry.path, 0, 0, *pagesize)
-            page.showPage()
-          except Exception as e:
-            print("skip {} by {}".format(entry.name, e))
+          page_list.append(entry.path)
+    page_list.sort()
+    for page_file in page_list:
+      try:
+        page.drawImage(page_file, 0, 0, *pagesize)
+        page.showPage()
+      except Exception as e:
+        print("skip {} by {}".format(entry.name, e))
     # PDFファイルとして保存
     page.save()
     # 日付を変更
