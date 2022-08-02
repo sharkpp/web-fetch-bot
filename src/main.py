@@ -8,7 +8,7 @@ from context import Context
 from action import load_actions
 from recipe import load_recipes
 from libraries.exceptions import QuitActionException, AbortActionException
-
+from libraries.system import caffeinate
 
 """
 webbook-dl main
@@ -29,9 +29,7 @@ args = parser.parse_args()
 #-------------------------------------------
 # main
 
-#print(args)
-#print(actions.keys())
-#print(recipes.keys())
+caffeinate()
 
 # 指定された Url を順に処理
 for url in args.urls:
