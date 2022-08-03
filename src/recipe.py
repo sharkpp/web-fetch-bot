@@ -27,7 +27,7 @@ def load_recipes(base_dir):
   recipes = {}
   # load recipes
   base_dir_ = path.join(base_dir, "recipes")
-  for root, dirs, files in walk(base_dir_):
+  for root, dirs, files in walk(base_dir_, followlinks=True):
     for entry in files:
       if re.fullmatch("^.+\.yaml$", entry) is None:
         continue
