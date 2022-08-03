@@ -1,5 +1,5 @@
 # misc
-/recipes/**/*.yaml
+/recipes/*
 /.*
 
 # macOS
