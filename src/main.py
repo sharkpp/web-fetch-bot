@@ -44,7 +44,7 @@ for url in args.urls:
       # Url にレシピがマッチするか
       if recipe.target.search(url) is None:
         continue
-      #print("{} ========".format(name))
+      print("{} ========".format(recipe.title))
 
       # レシピ内のアクションを順に処理
       ctx._exec_actions(recipe.actions)
