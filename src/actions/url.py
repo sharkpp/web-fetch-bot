@@ -111,6 +111,7 @@ def _url(ctx, params):
       body = response.content.decode(encoding)
 
   ctx.result_vars["res"] = {
+    "url": url,
     "body": body,
     "timestamp": content_last_modified_date # GMT
   }
