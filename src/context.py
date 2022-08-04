@@ -55,9 +55,12 @@ class Context:
     """
     変数を登録
     """
-    #print(vars_list.keys())
-    for name, s in vars_list.items():
-      self.vars[name] = self._apply_vars(self.result_vars, s)
+    if type(vars_list) == str:
+      # 文字列の場合は $ をもとに設定
+      self.vars[vars_list] = self._apply_vars(self.result_vars, "$$")
+    else:
+      for name, s in vars_list.items():
+        self.vars[name] = self._apply_vars(self.result_vars, s)
 
   def apply_vars(self, s):
     """
@@ -73,8 +76,11 @@ class Context:
       return s
     r = s
     pos_offset = 0
-    for m in re.finditer(r"\$(\{([0-9a-zA-Z_.-]+)\}|([0-9a-zA-Z_.-]+))", s, re.MULTILINE):
-      var_name = (m.group(2) or m.group(3)).split(".")
+    for m in re.finditer(r"\$(\{([0-9a-zA-Z_.-]+)\}|([0-9a-zA-Z_.-]+)|\$)", s, re.MULTILINE):
+      if "$" == m.group(1):
+        var_name = ["$$"]
+      else:
+        var_name = (m.group(2) or m.group(3)).split(".")
       var_value = var_list
       for var_name_token in var_name:
         if var_name_token in var_value:

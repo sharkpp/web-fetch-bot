@@ -13,21 +13,21 @@ actions:
   - name: pdf from dir
     pdf.from_dir:
       in: $DIR_PATH
-      out: $PDF_PATH
+      dest: $PDF_PATH
 """
 
 def _pdf_from_dir(ctx, params):
   try:
     in_dir = ctx.apply_vars(params["in"])
-    out_path = ctx.apply_vars(params["out"])
+    dest_path = ctx.apply_vars(params["dest"])
     timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
-    base_dir = path.dirname(out_path)
+    base_dir = path.dirname(dest_path)
     # PDF生成開始
     if not path.exists(base_dir):
       makedirs(base_dir)
     pagesize = portrait(A4)
     page = canvas.Canvas(\
-      out_path, \
+      dest_path, \
       pagesize=pagesize, \
       pageCompression=1 \
     )
@@ -50,7 +50,7 @@ def _pdf_from_dir(ctx, params):
     # 日付を変更
     if timestamp is not None:
       # ファイルのタイムスタンプを指定のものに変更
-      touch_file(out_path, timestamp)
+      touch_file(dest_path, timestamp)
 
   except Exception as e:
     print("_for", e)
