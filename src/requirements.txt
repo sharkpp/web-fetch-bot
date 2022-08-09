@@ -2,3 +2,5 @@ pyyaml
 requests
 pyjsparser
 reportlab
+bs4
+lxml

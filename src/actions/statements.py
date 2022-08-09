@@ -67,6 +67,20 @@ def _for(ctx, params):
     return False
   return True
 
+def _print(ctx, params):
+  target = params if params is not None and 0 < len(params) else ctx.vars.keys()
+  for k in target:
+    if k in ctx.vars:
+      v = ctx.vars[k]
+      if type(v) == str and \
+          128 < len(v):
+        print("{}{}: {}".format(k, type(v), v[:128]))
+      else:
+        print("{}{}: {}".format(k, type(v), v))
+    else:
+      print("{}: <None>".format(k))
+  return True
+
 def _abort(ctx, params):
   raise AbortActionException()
 
@@ -81,6 +95,7 @@ def get_actions():
     "let": _let,
     "foreach": _foreach,
     "for": _for,
+    "print": _print,
     "abort": _abort,
     "quit": _quit,
   }

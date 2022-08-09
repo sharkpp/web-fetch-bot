@@ -17,7 +17,7 @@ actions:
 
 def _match(ctx, params):
   in_text = ctx.apply_vars(params["in"])
-  pattern = params["pattern"]
+  pattern = ctx.apply_vars(params["pattern"])
   flags_ = params["flags"] if "flags" in params else ""
   out = params["out"]
   match_all = params["match_all"] if "match_all" in params else True

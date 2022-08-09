@@ -1,7 +1,8 @@
 # buildin pacakges
 from os import makedirs, path, stat, utime
-from datetime import datetime, timezone, timedelta
-from sys import version_info
+import json
+# 3rd party packages
+import yaml
 # my pacakges
 from libraries.file_util import touch_file
 
@@ -23,9 +24,8 @@ actions:
     file.read:
       src: hoge.json
       type: json
-      encode: utf8
-    set:
-      FUGA: ${res.contents}
+      encoding: utf8
+    set: FUGA
       # ^ set file contents to FUGA variable
       #   decode json to dict type
 """
@@ -62,7 +62,23 @@ def _file_write(ctx, params):
   return True
 
 def _file_read(ctx, params):
-  return False
+  src = ctx.apply_vars(params["src"])
+  type_ = params["type"]
+  encoding = params["encoding"] if "encoding" in params else "utf8"
+  #
+  try:
+    data = None
+    with open(src, mode="rb") as file:
+      if "json" == type_:
+        data = json.load(file)
+      elif "yaml" == type_:
+        data = yaml.safe_load(file)
+      else:
+        data = file.read().encode(encoding)
+    ctx.result_vars["$$"] = data
+  except Exception as e:
+    print("_file_read", e)
+  return True
 
 def get_actions():
   """

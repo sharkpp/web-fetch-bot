@@ -16,5 +16,20 @@ def touch_file(dest, timestamp = None):
   if timestamp is None:
     utime(path=dest, times=None)
   else:
+    if type(timestamp) is str:
+      # 文字列の場合は日付が指定されたとして処理する
+      for fmt in ([
+            "%Y-%m-%d %H:%M:%S",
+            "%Y/%m/%d %H:%M:%S",
+            "%Y%m%d%H%M%S",
+            "%Y-%m-%d",
+            "%Y/%m/%d",
+            "%Y%m%d",
+          ]):
+        try:
+          timestamp = datetime.strptime(timestamp, fmt)
+        except ValueError:
+          continue
+        break
     utime(path=dest, times=(sr.st_atime, \
       (timestamp + timestamp.astimezone(local_tz).utcoffset()).timestamp()))

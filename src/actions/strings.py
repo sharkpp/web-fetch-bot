@@ -26,7 +26,7 @@ def _replace(ctx, params):
     flags_ = params["flags"] if "flags" in params else ""
     old_str = params["old"]
     old_re = params["old"].strip("/")
-    new_str = params["new"]
+    new_str = params["new"] # キャプチャは ${99} 形式
     # フラグを構築
     flags = re.MULTILINE
     if 0 < flags_.find("i"):
@@ -36,9 +36,12 @@ def _replace(ctx, params):
     # 置換処理
     if old_str != old_re:
       # 正規表現で置換
-      new_str = re.sub(r"\$\{([0-9]+)\}", "\\1", new_str)
+      new_str = re.sub(r"\$\{((?![0-9]+).+)\}", "\\\${$1}", new_str) # 正規表現のキャプチャに直す
+      m = re.search(r"\$\{([0-9]+)\}", new_str) # 正規表現のキャプチャに直す
+      new_str = re.sub(r"\$\{([0-9]+)\}", "\\\\\\1", new_str) # 正規表現のキャプチャに直す
+      s = re.sub(old_re, new_str, in_str)
       ctx.result_vars["$$"] = \
-        ctx.apply_vars(re.sub(old_re, new_str, in_str))
+        ctx.apply_vars(s)
     else:
       # テキストを置換
       ctx.result_vars["$$"] = \
