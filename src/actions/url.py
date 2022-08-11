@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 import json
 import re
 import urllib
+import math
 # 3rd party packages
 import requests
 from requests.exceptions import Timeout
@@ -40,6 +41,8 @@ HEADER_CONTENT_TYPE = "Content-Type"
 HEADER_LAST_MODIFIED = "Last-Modified"
 HEADER_DATE = "Date"
 
+UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+
 url_match = re.compile("^((GET|POST)\s+)?(https?:\/\/.+)$")
 
 def _url(ctx, params):
@@ -47,7 +50,7 @@ def _url(ctx, params):
   try:
     encoding = None
     cookies = None
-    headers = None
+    headers = {}
     data = None
     if type(params) is str:
       params = ctx.apply_vars(params)
@@ -81,14 +84,21 @@ def _url(ctx, params):
     return False
 
   #print("_url",method,url,encoding)
+#  if cookies is not None:
+#    for i, cookie in enumerate(cookies):
+#      print("<%s>"%(i),cookie)
 
   reqopts = {
     "timeout": (REQUEST_CONNECT_TIMEOUT, REQUEST_RECV_TIMEOUT),
   }
+  headers["User-Agent"] = UA
   if cookies is not None:
     reqopts["cookies"] = cookies
-  if headers is not None:
+  if 0 < len(headers):
     reqopts["headers"] = headers
+
+  if cookies is not None:
+    reqopts["allow_redirects"] = False
 
   if "GET" == method:
     try:
@@ -122,8 +132,35 @@ def _url(ctx, params):
   else:
     return False
 
-  if 200 != response.status_code:
-    return False
+  if "allow_redirects" in reqopts and \
+      False == reqopts["allow_redirects"]:
+    # リダイレクトを処理する
+    history = []
+    if "data" in reqopts:
+      del reqopts["data"]
+    _url = url
+    while 300 == (math.floor(response.status_code / 100) * 100):
+      history.append(response)
+      if "/" == response.headers["Location"][0]: # 相対URL
+        _url = urljoin(_url, response.headers["Location"])
+      else: # 絶対URL
+        _url = response.headers["Location"]
+      #print(">>>",_url)
+      #print(">>>",response.cookies.keys())
+      #print(">>>",reqopts["cookies"].keys())
+      reqopts["cookies"].update(response.cookies)
+      try:
+        response = requests.get(
+          _url, **reqopts
+        )
+      except Timeout:
+        print("url", url, "timeout")
+        return False
+    response.history = history
+
+  #if (math.floor(response.status_code / 100) * 100) not in \
+  #    [ 200, 300 ]:
+  #  return False
 
   if encoding is None:
     if HEADER_CONTENT_TYPE in response.headers:
@@ -157,13 +194,41 @@ def _url(ctx, params):
     else:
       body = response.content.decode(encoding)
 
+  print("==========================")
+  for i, hist in enumerate(response.history):
+    print('history<'+str(i)+'>.request.url:', hist.request.url)
+    print('history<'+str(i)+'>.request.body:', hist.request.body)
+    print('history<'+str(i)+'>.request.headers:', hist.request.headers)
+    print('history<'+str(i)+'>.status_code:', hist.status_code)
+    print("--------------------------")
+  print('response.request.url:', response.request.url)
+  print('response.request.body:', response.request.body)
+  print('response.request.headers:', response.request.headers)
+  print('response.status_code:', response.status_code)
+  print('response.headers:', response.headers)
+  print("==========================")
+
+  #if "Set-Cookie" in response.headers:
+  #  #print("Set-Cookie",response.headers["Set-Cookie"])
+  #  response.headers["Set-Cookie"] = (
+  #    re.sub(r"Domain=.+?(,\s*|$)", "",
+  #    re.sub(r"Expires=.+?;\s*", "", 
+  #      response.headers["Set-Cookie"]))
+  #  )
+  #  #print("Set-Cookie@",response.headers["Set-Cookie"])
+  print("cookies",(response.cookies))
+
+  # クッキーをマージ
+  if cookies is not None:
+    response.cookies.update(cookies)
+
   ctx.result_vars["res"] = {
     "url": url,
     "body": body,
     "status": response.status_code,
     "headers": dict(response.headers),
     "timestamp": content_last_modified_date, # GMT
-    "cookies": response.cookies # GMT
+    "cookies": response.cookies
   }
 
   return True
