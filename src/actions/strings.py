@@ -58,7 +58,7 @@ def _format(ctx, params):
     format_ = params["format"]
     ctx.result_vars["$$"] = format(format_, in_str)
   except Exception as e:
-    print("_for", e)
+    print("_format", e)
     return False
   return True
 

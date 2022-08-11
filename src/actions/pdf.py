@@ -53,7 +53,7 @@ def _pdf_from_dir(ctx, params):
       touch_file(dest_path, timestamp)
 
   except Exception as e:
-    print("_for", e)
+    print("_pdf_from_dir", e)
     return False
   return True
 
