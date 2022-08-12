@@ -15,57 +15,62 @@ webbook-dl main
 >> application main entry
 """
 
-# load actions & recipes
-SRC_DIR = path.dirname(__file__)
-actions_cmds = load_actions(SRC_DIR)
-recipes = load_recipes(path.join(SRC_DIR, ".."))
+def main():
 
-# parse arguments
-parser = argparse.ArgumentParser(description="web book downloader")
-parser.add_argument("-d", "--debug", action="store_true", help="target urls")
-parser.add_argument("urls", metavar="URL", nargs="+", help="target urls")
-args = parser.parse_args()
+  # load actions & recipes
+  SRC_DIR = path.dirname(__file__)
+  actions_cmds = load_actions(SRC_DIR)
+  recipes = load_recipes(path.join(SRC_DIR, ".."))
 
-#-------------------------------------------
-# main
+  # parse arguments
+  parser = argparse.ArgumentParser(description="web book downloader")
+  parser.add_argument("-d", "--debug", action="store_true", help="target urls")
+  parser.add_argument("urls", metavar="URL", nargs="+", help="target urls")
+  args = parser.parse_args()
 
-caffeinate()
+  #-------------------------------------------
+  # main
 
-# 指定された Url を順に処理
-for url in args.urls:
-  #print("{} ------".format(url))
-  # Url にマッチするレシピを探して処理
-  for name, recipe in recipes.items():
-    ctx = Context(actions_cmds)
-    ctx.vars["URL"] = url
-    ctx.vars["TITLE"] = recipe.title
-    ctx.vars["BASE_DIR"] = recipe.title
-    try:
-      # Url にレシピがマッチするか
-      if recipe.target.search(url) is None:
-        continue
-      print("{} ========".format(recipe.title))
+  caffeinate()
 
-      # レシピ内のアクションを順に処理
-      ctx._exec_actions(recipe.actions)
+  # 指定された Url を順に処理
+  for url in args.urls:
+    #print("{} ------".format(url))
+    # Url にマッチするレシピを探して処理
+    for name, recipe in recipes.items():
+      ctx = Context(actions_cmds)
+      ctx.vars["URL"] = url
+      ctx.vars["TITLE"] = recipe.title
+      ctx.vars["BASE_DIR"] = recipe.title
+      try:
+        # Url にレシピがマッチするか
+        if recipe.target.search(url) is None:
+          continue
+        print("{} ========".format(recipe.title))
 
-      # 状態を保存
-      ctx.save_state()
+        # レシピ内のアクションを順に処理
+        ctx._exec_actions(recipe.actions)
 
-      # 一時ファイルをクリーン
-      ctx.temporaries_cleanup()
+        # 状態を保存
+        ctx.save_state()
 
-    except QuitActionException as e:
-      # 状態を保存
-      ctx.save_state()
-      # 一時ファイルをクリーン
-      ctx.temporaries_cleanup()
-      # 指示された場所で終了
-      sys.exit()
+        # 一時ファイルをクリーン
+        ctx.temporaries_cleanup()
 
-    except AbortActionException as e:
-      # 中断
-      sys.exit()
+      except QuitActionException as e:
+        # 状態を保存
+        ctx.save_state()
+        # 一時ファイルをクリーン
+        ctx.temporaries_cleanup()
+        # 指示された場所で終了
+        sys.exit()
 
-    except Exception as e:
-      print(name, e)  
+      except AbortActionException as e:
+        # 中断
+        sys.exit()
+
+      except Exception as e:
+        print(name, e)  
+
+if __name__ == '__main__':
+  main
