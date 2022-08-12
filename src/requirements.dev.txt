@@ -1,0 +1,5 @@
+# common packages
+-r requirements.txt
+# dev only packages
+sphinx
+sphinx_rtd_theme
