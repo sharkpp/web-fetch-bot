@@ -1,7 +1,8 @@
 # buildin pacakges
-import argparse
-import sys
+from contextlib import redirect_stderr
 from os import path
+import re
+import sys
 # 3rd party packages
 # my pacakges
 from context import Context
@@ -9,24 +10,54 @@ from action import load_actions
 from recipe import load_recipes
 from libraries.exceptions import QuitActionException, AbortActionException
 from libraries.system import caffeinate
+from libraries.mail_client import mail_command
 
 """
 webbook-dl main
 >> application main entry
 """
 
+def print_help():
+  print("""
+usage: %s [-h] \{ { mail } ... | URL [ URL ... ] }
+
+ebook download command
+
+default arguments:
+  URL            download target url
+
+positional arguments:
+  {commit,help}
+    commit       see `commit -h`
+    help         see `help -h`
+ 
+optional arguments:
+  -h, --help     show this help message and exit
+""" % (
+    sys.argv[0]
+  ))
+
 def main():
+  
+  args = sys.argv[1:]
+
+  if len(args) <= 0:
+    print_help()
+    return
+
+  if mail_command(args):
+    return
+  elif re.search(r"^https?:.+", args[0]) is not None:
+    download_urls(args)
+  else:
+    print_help()
+
+def download_urls(urls):
 
   # load actions & recipes
   SRC_DIR = path.dirname(__file__)
   actions_cmds = load_actions(SRC_DIR)
   recipes = load_recipes(path.join(SRC_DIR, ".."))
-
-  # parse arguments
-  parser = argparse.ArgumentParser(description="web book downloader")
-  parser.add_argument("-d", "--debug", action="store_true", help="target urls")
-  parser.add_argument("urls", metavar="URL", nargs="+", help="target urls")
-  args = parser.parse_args()
 
   #-------------------------------------------
   # main
@@ -34,7 +65,7 @@ def main():
   caffeinate()
 
   # 指定された Url を順に処理
-  for url in args.urls:
+  for url in urls:
     #print("{} ------".format(url))
     # Url にマッチするレシピを探して処理
     for name, recipe in recipes.items():
@@ -72,5 +103,5 @@ def main():
       except Exception as e:
         print(name, e)  
 
-if __name__ == '__main__':
-  main
+if __name__ == "__main__":
+  main()
