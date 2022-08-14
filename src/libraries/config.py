@@ -30,29 +30,36 @@ def save():
     yaml.dump(config_store, f)
   return True
 
-def get(name, defaultValue=None):
+def get(name_or_keys, defaultValue=None):
   global config_file_path
   global config_store
   if config_store is None:
     return None
-  # ドットで分割して潜る
-  name_tokens = name.split(".")
+  if type(name_or_keys) is list:
+    name_tokens = name_or_keys
+  else:
+    # ドットで分割して潜る
+    name_tokens = name_or_keys.split(".")
   store = config_store
   for name_token in name_tokens:
-    if name_token in store:
+    if store is not None and\
+       name_token in store:
       store = store[name_token]
     else:
       store = defaultValue
       break
   return store
 
-def set(name, value):
+def set(name_or_keys, value):
   global config_file_path
   global config_store
   if config_store is None:
     return None
-  # ドットで分割して潜る
-  name_tokens = name.split(".")
+  if type(name_or_keys) is list:
+    name_tokens = name_or_keys
+  else:
+    # ドットで分割して潜る
+    name_tokens = name_or_keys.split(".")
   store = config_store
   store_stack = [ config_store ]
   names_stack = [ None ]
@@ -67,4 +74,5 @@ def set(name, value):
     store_stack.append(store[name_token])
     names_stack.append(name_token)
   store_stack[len(store_stack)-2][names_stack[len(store_stack)-1]] = value
+  save()
   return True
