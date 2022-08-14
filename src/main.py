@@ -11,6 +11,7 @@ from recipe import load_recipes
 from libraries.exceptions import QuitActionException, AbortActionException
 from libraries.system import caffeinate
 from libraries.mail_client import mail_command
+import libraries.config as config
 
 """
 webbook-dl main
@@ -18,8 +19,8 @@ webbook-dl main
 """
 
 def print_help():
-  print("""
-usage: %s [-h] \{ { mail } ... | URL [ URL ... ] }
+  print(
+"""usage: %s [-h] { <command> ... | URL [ URL ... ] }
 
 ebook download command
 
@@ -38,6 +39,8 @@ optional arguments:
   ))
 
 def main():
+
+  config.load("config.yaml")
   
   args = sys.argv[1:]
 
