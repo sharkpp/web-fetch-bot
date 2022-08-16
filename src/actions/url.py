@@ -194,19 +194,19 @@ def _url(ctx, params):
     else:
       body = response.content.decode(encoding)
 
-  print("==========================")
-  for i, hist in enumerate(response.history):
-    print('history<'+str(i)+'>.request.url:', hist.request.url)
-    print('history<'+str(i)+'>.request.body:', hist.request.body)
-    print('history<'+str(i)+'>.request.headers:', hist.request.headers)
-    print('history<'+str(i)+'>.status_code:', hist.status_code)
-    print("--------------------------")
-  print('response.request.url:', response.request.url)
-  print('response.request.body:', response.request.body)
-  print('response.request.headers:', response.request.headers)
-  print('response.status_code:', response.status_code)
-  print('response.headers:', response.headers)
-  print("==========================")
+  #print("==========================")
+  #for i, hist in enumerate(response.history):
+  #  print('history<'+str(i)+'>.request.url:', hist.request.url)
+  #  print('history<'+str(i)+'>.request.body:', hist.request.body)
+  #  print('history<'+str(i)+'>.request.headers:', hist.request.headers)
+  #  print('history<'+str(i)+'>.status_code:', hist.status_code)
+  #  print("--------------------------")
+  #print('response.request.url:', response.request.url)
+  #print('response.request.body:', response.request.body)
+  #print('response.request.headers:', response.request.headers)
+  #print('response.status_code:', response.status_code)
+  #print('response.headers:', response.headers)
+  #print("==========================")
 
   #if "Set-Cookie" in response.headers:
   #  #print("Set-Cookie",response.headers["Set-Cookie"])
@@ -216,7 +216,7 @@ def _url(ctx, params):
   #      response.headers["Set-Cookie"]))
   #  )
   #  #print("Set-Cookie@",response.headers["Set-Cookie"])
-  print("cookies",(response.cookies))
+  #print("cookies",(response.cookies))
 
   # クッキーをマージ
   if cookies is not None:
