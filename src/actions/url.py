@@ -97,8 +97,8 @@ def _url(ctx, params):
   if 0 < len(headers):
     reqopts["headers"] = headers
 
-  if cookies is not None:
-    reqopts["allow_redirects"] = False
+  # クッキーを処理するためにリダイレクトを処理する
+  reqopts["allow_redirects"] = False
 
   if "GET" == method:
     try:
@@ -141,14 +141,18 @@ def _url(ctx, params):
     _url = url
     while 300 == (math.floor(response.status_code / 100) * 100):
       history.append(response)
-      if "/" == response.headers["Location"][0]: # 相対URL
+      if re.search(r"^http:\/\/.+", response.headers["Location"][0]) is None: # 相対URL
         _url = urljoin(_url, response.headers["Location"])
       else: # 絶対URL
         _url = response.headers["Location"]
       #print(">>>",_url)
       #print(">>>",response.cookies.keys())
       #print(">>>",reqopts["cookies"].keys())
-      reqopts["cookies"].update(response.cookies)
+      # クッキーを更新する
+      if "cookies" not in reqopts:
+        cookies = reqopts["cookies"] = response.cookies
+      else:
+        reqopts["cookies"].update(response.cookies)
       try:
         response = requests.get(
           _url, **reqopts
@@ -157,10 +161,6 @@ def _url(ctx, params):
         print("url", url, "timeout")
         return False
     response.history = history
-
-  #if (math.floor(response.status_code / 100) * 100) not in \
-  #    [ 200, 300 ]:
-  #  return False
 
   if encoding is None:
     if HEADER_CONTENT_TYPE in response.headers:
@@ -200,7 +200,9 @@ def _url(ctx, params):
   #  print('history<'+str(i)+'>.request.body:', hist.request.body)
   #  print('history<'+str(i)+'>.request.headers:', hist.request.headers)
   #  print('history<'+str(i)+'>.status_code:', hist.status_code)
+  #  print('history<'+str(i)+'>.headers:', hist.headers)
   #  print("--------------------------")
+  #print('response.url:', response.url)
   #print('response.request.url:', response.request.url)
   #print('response.request.body:', response.request.body)
   #print('response.request.headers:', response.request.headers)
@@ -220,7 +222,7 @@ def _url(ctx, params):
 
   # クッキーをマージ
   if cookies is not None:
-    response.cookies.update(cookies)
+    response.cookies.update(reqopts["cookies"])
 
   ctx.result_vars["res"] = {
     "url": url,
