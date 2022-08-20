@@ -17,6 +17,10 @@ def _query_selector(ctx, params):
   try:
     in_str = ctx.apply_vars(params["in"])
     selector = ctx.apply_vars(params["selector"])
+    # prefix fallback
+    selector = selector.replace(":contains(", ":-soup-contains(") # The pseudo class ':contains' is deprecated, ':-soup-contains' should be used moving forward.
+    selector = selector.replace(":contains-own(", ":-soup-contains-own(")
+    #
     match_all = params["match_all"] if "match_all" in params else False
     if "<?xml" == in_str[0:5]:
       parser_type = "xml"
