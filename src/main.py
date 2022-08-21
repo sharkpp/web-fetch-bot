@@ -1,16 +1,17 @@
 # buildin pacakges
 from contextlib import redirect_stderr
 from os import path
+from datetime import datetime, timezone
 import re
 import sys
 # 3rd party packages
 # my pacakges
-from context import Context
 from action import load_actions
+from context import Context
 from recipe import load_recipes
 from libraries.exceptions import QuitActionException, AbortActionException
-from libraries.system import caffeinate
 from libraries.mail_client import mail_command
+from libraries.system import caffeinate
 import libraries.config as config
 
 """
@@ -76,6 +77,7 @@ def download_urls(urls):
       ctx.vars["URL"] = url
       ctx.vars["TITLE"] = recipe.title
       ctx.vars["BASE_DIR"] = recipe.title
+      ctx.vars["START_TIME"] = datetime.now(timezone.utc)
       try:
         # Url にレシピがマッチするか
         if recipe.target.search(url) is None:
