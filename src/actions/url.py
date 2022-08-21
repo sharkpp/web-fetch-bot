@@ -45,6 +45,8 @@ UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, l
 
 url_match = re.compile("^((GET|POST)\s+)?(https?:\/\/.+)$")
 
+requests.adapters.DEFAULT_RETRIES = 5
+
 def _url(ctx, params):
   #print("_url",params)
   try:
@@ -100,9 +102,12 @@ def _url(ctx, params):
   # クッキーを処理するためにリダイレクトを処理する
   reqopts["allow_redirects"] = False
 
+  req = requests.session()
+  req.keep_alive = False
+
   if "GET" == method:
     try:
-      response = requests.get(
+      response = req.get(
         url, **reqopts
       )
     except Timeout:
@@ -123,7 +128,7 @@ def _url(ctx, params):
       reqopts["data"] = data
     # POST
     try:
-      response = requests.post(
+      response = req.post(
         url, **reqopts
       )
     except Timeout:
@@ -154,7 +159,7 @@ def _url(ctx, params):
       else:
         reqopts["cookies"].update(response.cookies)
       try:
-        response = requests.get(
+        response = req.get(
           _url, **reqopts
         )
       except Timeout:
@@ -194,21 +199,22 @@ def _url(ctx, params):
     else:
       body = response.content.decode(encoding)
 
-  #print("==========================")
-  #for i, hist in enumerate(response.history):
-  #  print('history<'+str(i)+'>.request.url:', hist.request.url)
-  #  print('history<'+str(i)+'>.request.body:', hist.request.body)
-  #  print('history<'+str(i)+'>.request.headers:', hist.request.headers)
-  #  print('history<'+str(i)+'>.status_code:', hist.status_code)
-  #  print('history<'+str(i)+'>.headers:', hist.headers)
-  #  print("--------------------------")
-  #print('response.url:', response.url)
-  #print('response.request.url:', response.request.url)
-  #print('response.request.body:', response.request.body)
-  #print('response.request.headers:', response.request.headers)
-  #print('response.status_code:', response.status_code)
-  #print('response.headers:', response.headers)
-  #print("==========================")
+  print("==========================")
+  for i, hist in enumerate(response.history):
+    print('history<'+str(i)+'>.request.url:', hist.request.url)
+    print('history<'+str(i)+'>.request.body:', hist.request.body)
+    print('history<'+str(i)+'>.request.headers:', hist.request.headers)
+    print('history<'+str(i)+'>.status_code:', hist.status_code)
+    print('history<'+str(i)+'>.headers:', hist.headers)
+    print("--------------------------")
+  print('url:', url)
+  print('response.url:', response.url)
+  print('response.request.url:', response.request.url)
+  print('response.request.body:', response.request.body)
+  print('response.request.headers:', response.request.headers)
+  print('response.status_code:', response.status_code)
+  print('response.headers:', response.headers)
+  print("==========================")
 
   #if "Set-Cookie" in response.headers:
   #  #print("Set-Cookie",response.headers["Set-Cookie"])
@@ -230,7 +236,8 @@ def _url(ctx, params):
     "status": response.status_code,
     "headers": dict(response.headers),
     "timestamp": content_last_modified_date, # GMT
-    "cookies": response.cookies
+    "cookies": response.cookies,
+    "response_url": response.url,
   }
 
   return True
