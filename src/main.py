@@ -12,6 +12,7 @@ from recipe import load_recipes
 from libraries.exceptions import QuitActionException, AbortActionException
 from libraries.mail_client import mail_command
 from libraries.system import caffeinate
+from libraries.arguments import parse_arguments
 import libraries.config as config
 
 """
@@ -39,6 +40,25 @@ optional arguments:
     sys.argv[0]
   ))
 
+def download_command(params):
+  # 引数解析
+  args = parse_arguments(params, [
+    [ "urls",               { "nargs": "+"         } ],
+    [ "-d", "--debug",      { "dest": "debug",     "action": "store_true" } ],
+    [ "-r", "--recipe-dir", { "dest": "recipe_dir" } ],
+  ])
+  # 引数解析結果確認
+  print("args",args)
+  if args is None:
+    return False
+  # ダウンロード実行
+  download_urls(
+    args.urls,
+    debug=args.debug,
+    recipe_dir=args.recipe_dir
+  )
+  return True
+
 def main():
 
   config.load("config.yaml")
@@ -51,17 +71,21 @@ def main():
 
   if mail_command(args):
     return
-  elif re.search(r"^https?:.+", args[0]) is not None:
-    download_urls(args)
+  elif download_command(args):
+    return
   else:
     print_help()
 
-def download_urls(urls):
+def download_urls(urls, debug=False, recipe_dir=None):
 
   # load actions & recipes
   SRC_DIR = path.dirname(__file__)
   actions_cmds = load_actions(SRC_DIR)
-  recipes = load_recipes(path.join(SRC_DIR, ".."))
+  recipes = load_recipes(
+    recipe_dir if recipe_dir is not None \
+      else path.join(SRC_DIR, "..", "recipes"),
+    debug=debug
+  )
 
   #-------------------------------------------
   # main
@@ -82,7 +106,8 @@ def download_urls(urls):
         # Url にレシピがマッチするか
         if recipe.target.search(url) is None:
           continue
-        print("{} ========".format(recipe.title))
+        if debug:
+          print("{} ========".format(recipe.title))
 
         # レシピ内のアクションを順に処理
         ctx._exec_actions(recipe.actions)
@@ -106,7 +131,8 @@ def download_urls(urls):
         sys.exit()
 
       except Exception as e:
-        print(name, e)  
+        if debug:
+          print(name, e)  
 
 if __name__ == "__main__":
   main()
