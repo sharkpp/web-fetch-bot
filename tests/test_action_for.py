@@ -5,7 +5,7 @@ from common import run_main
 
 class TestActionFor(unittest.TestCase):
 
-    def test_for(self):
+    def test_normal_case(self):
 
         out = run_main("recipes_for")
         out = out.split("\n")

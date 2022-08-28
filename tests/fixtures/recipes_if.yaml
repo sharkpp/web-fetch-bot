@@ -1,0 +1,50 @@
+title: fixture for "if action"
+target: https://example.net/tests/recipes_if
+actions:
+
+  - let:
+      V: True
+  - if:
+      condition: "True == $V"
+      then:
+        - let:
+            RES1: 1
+      else:
+        - let:
+            RES1: 2
+  - print:
+      - RES1
+
+  - let:
+      A.X: False
+  - if:
+      condition: "True == ${A.X}"
+      then:
+        - let:
+            RES2: 1
+      else:
+        - let:
+            RES2: 2
+  - print:
+      - RES2
+
+  - for:
+      start: 1
+      end: 4
+      step: 1
+      let: I
+      do:
+        - if:
+            condition: "1 == $I"
+            then:
+              - let:
+                  RES3: 1
+            elif:
+              - "2 == ${I}"
+              - let:
+                  RES3: 2
+            else:
+              - let:
+                  RES3: 3
+        - print:
+          - RES3

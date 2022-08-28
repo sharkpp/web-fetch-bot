@@ -2,6 +2,7 @@
 import sys
 # my pacakges
 from libraries.exceptions import ActionException, QuitActionException, AbortActionException
+from libraries.util import dict_set_deep
 
 """
 actions:
@@ -30,7 +31,7 @@ actions:
 
 def _let(ctx, params):
   for k, v in params.items():
-    ctx.vars[k] = ctx.apply_vars(v)
+    dict_set_deep(ctx.vars, k, ctx.apply_vars(v))
   return True
 
 def _foreach(ctx, params):
@@ -67,6 +68,32 @@ def _for(ctx, params):
     return False
   return True
 
+def _if(ctx, params):
+  try:
+    condition = ctx.apply_vars(params["condition"])
+    then_ = params["then"]
+    else_ = params["else"] if "else" in params else []
+    elif_ = params["elif"] if "elif" in params else None
+    if eval(condition, {}, ctx.vars):
+      ctx._exec_actions(then_)
+    else:
+      if elif_ is not None and \
+          1 < len(elif_) and \
+          eval(ctx.apply_vars(elif_[0]), {}, ctx.vars):
+        ctx._exec_actions(elif_[1:])
+      else:
+        ctx._exec_actions(else_)
+    #print("condition",condition)
+    #print("then_",then_)
+    #print("else_",else_)
+    #print("elselif_e_",elif_)
+  except ActionException as e:
+    raise
+  except Exception as e:
+    print("_if", e)      
+    return False
+  return True
+
 def _print(ctx, params):
   target = params if params is not None and 0 < len(params) else ctx.vars.keys()
   for k in target:
@@ -95,6 +122,7 @@ def get_actions():
     "let": _let,
     "foreach": _foreach,
     "for": _for,
+    "if": _if,
     "print": _print,
     "abort": _abort,
     "quit": _quit,
