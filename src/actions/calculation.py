@@ -19,7 +19,7 @@ MATCH_DATETIME = "([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{
 
 # '65.3s' にマッチ
 #                   <------- 1 ------->  <----------- 2 ----------->
-MATCH_TIMEDELTA = "([0-9]+(?:\.[0-9]+)?)(ms|msec|s|sec|m|min|h|hour|d|day|w|week)"
+MATCH_TIMEDELTA = "([0-9]+(?:\.[0-9]+)?)(week|w|sec|s|msec|ms|min|m|hour|h|day|d)"
 
 # 全ての条件を一回で処理
 MATCH_PATTERN = "(?:(?:" + ")|(?:".join([
