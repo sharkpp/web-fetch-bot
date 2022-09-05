@@ -11,6 +11,7 @@ def run_main(target):
     [
       "python",
       path.join(path.dirname(__file__), "..", "src", "main.py"),
+      "-d",
       "--recipe-dir", path.join(path.dirname(__file__), "fixtures"),
       url
     ],

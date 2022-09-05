@@ -48,7 +48,7 @@ def download_command(params):
     [ "-r", "--recipe-dir", { "dest": "recipe_dir" } ],
   ])
   # 引数解析結果確認
-  print("args",args)
+  #print("args",args)
   if args is None:
     return False
   # ダウンロード実行
