@@ -6,7 +6,7 @@ from os import scandir, path
 # my pacakges
 
 """
-webbook-dl action
+web-fetch-bot action
 >> define constants and functions related to action
 """
 

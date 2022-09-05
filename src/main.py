@@ -16,7 +16,7 @@ from libraries.arguments import parse_arguments
 import libraries.config as config
 
 """
-webbook-dl main
+web-fetch-bot main
 >> application main entry
 """
 

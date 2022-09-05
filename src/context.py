@@ -8,7 +8,7 @@ import yaml
 from action import BuildinActionKey
 
 """
-webbook-dl context
+web-fetch-bot context
 >> define class related to context
 """
 

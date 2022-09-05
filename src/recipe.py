@@ -6,7 +6,7 @@ import yaml
 # my pacakges
 
 """
-webbook-dl recipe
+web-fetch-bot recipe
 >> define class and functions related to action
 """
 
