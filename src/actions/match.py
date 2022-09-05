@@ -37,7 +37,7 @@ def _match(ctx, params):
     # マッチした内容を指定された構造に
     match = {}
     for k, v in out.items():
-      match[k] = ctx._apply_vars(matches_groups, v)
+      match[k] = ctx._apply_vars({**matches_groups, **ctx.vars}, v)
     matches.append(match)
   if match_all:
     ctx.result_vars["matches"] = matches
