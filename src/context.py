@@ -6,6 +6,7 @@ from os import path
 import yaml
 # my pacakges
 from action import BuildinActionKey
+from libraries.logger import logger
 
 """
 web-fetch-bot context
@@ -13,6 +14,8 @@ web-fetch-bot context
 """
 
 class Context:
+  call_level = 0
+  debug = False
   vars = None
   result_vars = None
   action_cmds = None
@@ -20,7 +23,9 @@ class Context:
   state = None
   temporaries = None
 
-  def __init__(self, action_cmds):
+  def __init__(self, action_cmds, debug=False):
+    self.call_level = 0
+    self.debug = debug
     self.vars = {}
     self.result_vars = {}
     self.action_cmds = action_cmds
@@ -100,6 +105,7 @@ class Context:
     """
     アクションを実行
     """
+    self.call_level += 1
     for action in actions:
       # アクションを取得
       action_type = None
@@ -112,7 +118,7 @@ class Context:
 
       # 名称を印字
       if BuildinActionKey.NAME.value in action:
-        print(action[BuildinActionKey.NAME.value], ">>>>>>>>>>>>>>>>>>")
+        logger.debug("".join([">"] * self.call_level) + " " + self.apply_vars(action[BuildinActionKey.NAME.value]))
 
       self.reset_vars()
 
@@ -131,6 +137,7 @@ class Context:
       # 変数を作成
       if BuildinActionKey.SET.value in action:
         self.register_vars(action[BuildinActionKey.SET.value])
+    self.call_level -= 1
 
   def read_state(self, fname):
     """

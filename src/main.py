@@ -2,6 +2,7 @@
 from contextlib import redirect_stderr
 from os import path
 from datetime import datetime, timezone
+import logging
 import re
 import sys
 # 3rd party packages
@@ -13,6 +14,7 @@ from libraries.exceptions import QuitActionException, AbortActionException
 from libraries.mail_client import mail_command
 from libraries.system import caffeinate
 from libraries.arguments import parse_arguments
+from libraries.logger import logger
 import libraries.config as config
 
 """
@@ -51,6 +53,9 @@ def download_command(params):
   #print("args",args)
   if args is None:
     return False
+  # ログのレベル
+  if args.debug:
+    logger.setLevel(logger.DEBUG)
   # ダウンロード実行
   download_urls(
     args.urls,
@@ -97,7 +102,7 @@ def download_urls(urls, debug=False, recipe_dir=None):
     #print("{} ------".format(url))
     # Url にマッチするレシピを探して処理
     for name, recipe in recipes.items():
-      ctx = Context(actions_cmds)
+      ctx = Context(actions_cmds, debug=debug)
       ctx.vars["URL"] = url
       ctx.vars["TITLE"] = recipe.title
       ctx.vars["BASE_DIR"] = recipe.title

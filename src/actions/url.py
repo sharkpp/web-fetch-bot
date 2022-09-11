@@ -9,6 +9,7 @@ import math
 import requests
 from requests.exceptions import Timeout
 # my pacakges
+from libraries.logger import logger
 
 """
 actions:
@@ -82,13 +83,13 @@ def _url(ctx, params):
           else:
             data[k] = ""
   except Exception as e:
-    print("_url",e)
+    logger.error("_url",e)
     return False
 
-  #print("_url",method,url,encoding)
+  #logger.debug("_url",method,url,encoding)
 #  if cookies is not None:
 #    for i, cookie in enumerate(cookies):
-#      print("<%s>"%(i),cookie)
+#      logger.debug("<%s>"%(i),cookie)
 
   reqopts = {
     "timeout": (REQUEST_CONNECT_TIMEOUT, REQUEST_RECV_TIMEOUT),
@@ -111,7 +112,7 @@ def _url(ctx, params):
         url, **reqopts
       )
     except Timeout:
-      print("url", url, "timeout")
+      logger.warning("url", url, "timeout")
       return False
   elif "POST" == method:
     # POST内容をコンテント種別ごとに処理を変えて準備
@@ -132,7 +133,7 @@ def _url(ctx, params):
         url, **reqopts
       )
     except Timeout:
-      print("url", url, "timeout")
+      logger.error("url", url, "timeout")
       return False
   else:
     return False
@@ -150,9 +151,9 @@ def _url(ctx, params):
         _url = urljoin(_url, response.headers["Location"])
       else: # 絶対URL
         _url = response.headers["Location"]
-      #print(">>>",_url)
-      #print(">>>",response.cookies.keys())
-      #print(">>>",reqopts["cookies"].keys())
+      #logger.debug(">>>",_url)
+      #logger.debug(">>>",response.cookies.keys())
+      #logger.debug(">>>",reqopts["cookies"].keys())
       # クッキーを更新する
       if "cookies" not in reqopts:
         cookies = reqopts["cookies"] = response.cookies
@@ -175,9 +176,9 @@ def _url(ctx, params):
       else:
         encoding = "binary"
 
-  #print(response.status_code)    # HTTPのステータスコード取得
-  #print(response.text)    # レスポンスのHTMLを文字列で取得
-  #print(response.headers)
+  #logger.debug(response.status_code)    # HTTPのステータスコード取得
+  #logger.debug(response.text)    # レスポンスのHTMLを文字列で取得
+  #logger.debug(response.headers)
 
   # Last-Modified: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT
   # >> https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Last-Modified
@@ -199,32 +200,32 @@ def _url(ctx, params):
     else:
       body = response.content.decode(encoding)
 
-  print("==========================")
+  logger.debug("==========================")
   for i, hist in enumerate(response.history):
-    print('history<'+str(i)+'>.request.url:', hist.request.url)
-    print('history<'+str(i)+'>.request.body:', hist.request.body)
-    print('history<'+str(i)+'>.request.headers:', hist.request.headers)
-    print('history<'+str(i)+'>.status_code:', hist.status_code)
-    print('history<'+str(i)+'>.headers:', hist.headers)
-    print("--------------------------")
-  print('url:', url)
-  print('response.url:', response.url)
-  print('response.request.url:', response.request.url)
-  print('response.request.body:', response.request.body)
-  print('response.request.headers:', response.request.headers)
-  print('response.status_code:', response.status_code)
-  print('response.headers:', response.headers)
-  print("==========================")
+    logger.debug('history<'+str(i)+'>.request.url:', hist.request.url)
+    logger.debug('history<'+str(i)+'>.request.body:', hist.request.body)
+    logger.debug('history<'+str(i)+'>.request.headers:', hist.request.headers)
+    logger.debug('history<'+str(i)+'>.status_code:', hist.status_code)
+    logger.debug('history<'+str(i)+'>.headers:', hist.headers)
+    logger.debug("--------------------------")
+  logger.debug('url:', url)
+  logger.debug('response.url:', response.url)
+  logger.debug('response.request.url:', response.request.url)
+  logger.debug('response.request.body:', response.request.body)
+  logger.debug('response.request.headers:', response.request.headers)
+  logger.debug('response.status_code:', response.status_code)
+  logger.debug('response.headers:', response.headers)
+  logger.debug("==========================")
 
   #if "Set-Cookie" in response.headers:
-  #  #print("Set-Cookie",response.headers["Set-Cookie"])
+  #  #logger.debug("Set-Cookie",response.headers["Set-Cookie"])
   #  response.headers["Set-Cookie"] = (
   #    re.sub(r"Domain=.+?(,\s*|$)", "",
   #    re.sub(r"Expires=.+?;\s*", "", 
   #      response.headers["Set-Cookie"]))
   #  )
-  #  #print("Set-Cookie@",response.headers["Set-Cookie"])
-  #print("cookies",(response.cookies))
+  #  #logger.debug("Set-Cookie@",response.headers["Set-Cookie"])
+  #logger.debug("cookies",(response.cookies))
 
   # クッキーをマージ
   if cookies is not None:
