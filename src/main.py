@@ -24,20 +24,24 @@ web-fetch-bot main
 
 def print_help():
   print(
-"""usage: %s [-h] { <command> ... | URL [ URL ... ] }
+"""usage: %s [-h] { <command> ... | <OPTIONS> URL [ URL ... ] }
 
-ebook download command
+web content download command
 
 default arguments:
   URL            download target url
 
 positional arguments:
-  {commit,help}
-    commit       see `commit -h`
+  {mail,help}
+    mail         see `mail -h`
     help         see `help -h`
  
 optional arguments:
-  -h, --help     show this help message and exit
+  -h, --help        show this help message and exit
+
+OPTIONS
+  -v*,  --verbose   show verbose messages
+  -r, --recipe-dir  set recipe dir
 """ % (
     sys.argv[0]
   ))
@@ -45,8 +49,8 @@ optional arguments:
 def download_command(params):
   # 引数解析
   args = parse_arguments(params, [
-    [ "urls",               { "nargs": "+"         } ],
-    [ "-d", "--debug",      { "dest": "debug",     "action": "store_true" } ],
+    [ "urls",               { "nargs": "+" } ],
+    [ "-v", "--verbose",    { "dest": "verbose", "action": "count", "default": 0 } ],
     [ "-r", "--recipe-dir", { "dest": "recipe_dir" } ],
   ])
   # 引数解析結果確認
@@ -54,12 +58,16 @@ def download_command(params):
   if args is None:
     return False
   # ログのレベル
-  if args.debug:
+  if 1 < args.verbose:
     logger.setLevel(logger.DEBUG)
+  elif 0 < args.verbose:
+    logger.setLevel(logger.INFO)
+  else:
+    logger.setLevel(logger.WARNING)
   # ダウンロード実行
   download_urls(
     args.urls,
-    debug=args.debug,
+    debug=1<args.verbose,
     recipe_dir=args.recipe_dir
   )
   return True
