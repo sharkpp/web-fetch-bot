@@ -12,7 +12,8 @@ def caffeinate():
       proc_caffeinate = subprocess.Popen("caffeinate")
 
   def cleanup():
-    if proc_caffeinate:
+    global proc_caffeinate
+    if proc_caffeinate is not None:
       proc_caffeinate.terminate()
 
   atexit.register(cleanup)
