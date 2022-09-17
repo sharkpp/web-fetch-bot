@@ -1,10 +1,12 @@
 # buildin pacakges
 from os import makedirs, path, stat, utime
 import json
+import traceback
 # 3rd party packages
 import yaml
 # my pacakges
 from libraries.file_util import touch_file
+from libraries.logger import logger
 
 """
 actions:
@@ -77,7 +79,7 @@ def _file_read(ctx, params):
         data = file.read().encode(encoding)
     ctx.result_vars["$$"] = data
   except Exception as e:
-    print("_file_read", e)
+    logger.error("_file_read", traceback.format_exc())
   return True
 
 def get_actions():

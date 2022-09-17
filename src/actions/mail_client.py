@@ -1,12 +1,14 @@
 # buildin pacakges
 import re
 import math
+import traceback
 from time import sleep
 from datetime import datetime, timezone, timedelta
 # 3rd party packages
 # my pacakges
 from libraries.mail_client import read
 from libraries.util import dict_get_deep, dict_set_deep
+from libraries.logger import logger
 
 """
 Mail client action
@@ -104,7 +106,7 @@ def _mail_read(ctx, params):
       sleep(read_wait / 1000)
 
   except Exception as e:
-    print("_mail_read", e)
+    logger.error("_mail_read", traceback.format_exc())
     return False
 
   return 0 < len(ctx.result_vars)

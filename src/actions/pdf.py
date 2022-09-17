@@ -2,11 +2,13 @@
 from os import makedirs, scandir, path, stat, utime
 from datetime import datetime, timezone, timedelta
 import re
+import traceback
 # 3rd party packages
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, portrait
 # my pacakges
 from libraries.file_util import touch_file
+from libraries.logger import logger
 
 """
 actions:
@@ -53,7 +55,7 @@ def _pdf_from_dir(ctx, params):
       touch_file(dest_path, timestamp)
 
   except Exception as e:
-    print("_pdf_from_dir", e)
+    logger.error("_pdf_from_dir", traceback.format_exc())
     return False
   return True
 

@@ -1,7 +1,9 @@
 # buildin pacakges
 import re
+import traceback
 # my pacakges
 from libraries.format import format
+from libraries.logger import logger
 
 """
 actions:
@@ -47,7 +49,7 @@ def _replace(ctx, params):
       ctx.result_vars["$$"] = \
         ctx.apply_vars(in_str.replace(old_str, new_str))
   except Exception as e:
-    print("_replace", e)
+    logger.error("_replace", traceback.format_exc())
     return False
   return True
 
@@ -58,7 +60,7 @@ def _format(ctx, params):
     format_ = params["format"]
     ctx.result_vars["$$"] = format(format_, in_str)
   except Exception as e:
-    print("_format", e)
+    logger.error("_format", traceback.format_exc())
     return False
   return True
 

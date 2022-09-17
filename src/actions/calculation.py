@@ -1,7 +1,10 @@
 # buildin pacakges
 import re
+import traceback
 from enum import IntEnum
 from datetime import datetime, timedelta
+# my pacakges
+from libraries.logger import logger
 
 """
 actions:
@@ -71,7 +74,7 @@ def _calculation(ctx, params):
     ctx.result_vars["$$"] = r
     #print(expr, r)
   except Exception as e:
-    print("_calculation", e, expr)
+    logger.error("_calculation", expr, traceback.format_exc())
     return False
 
   return True

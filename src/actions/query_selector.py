@@ -1,4 +1,5 @@
 # buildin pacakges
+import traceback
 # 3rd party packages
 from bs4 import BeautifulSoup
 # my pacakges

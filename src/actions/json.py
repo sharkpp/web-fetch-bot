@@ -1,9 +1,12 @@
 # buildin pacakges
 import json
 import re
+import traceback
 from enum import Enum
 # 3rd party packages
 from pyjsparser import parse
+# my pacakges
+from libraries.logger import logger
 
 """
 actions:
@@ -58,7 +61,7 @@ def _json_parse(ctx, params):
       ctx.vars[out_var] = json.loads(in_str)
     # フラグを構築
   except Exception as e:
-    print("_json_parse", e)
+    logger.error("_json_parse", traceback.format_exc())
     return False
   return True
 

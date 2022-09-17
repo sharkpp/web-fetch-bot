@@ -5,6 +5,7 @@ import json
 import re
 import urllib
 import math
+import traceback
 # 3rd party packages
 import requests
 from requests.exceptions import Timeout
@@ -83,7 +84,7 @@ def _url(ctx, params):
           else:
             data[k] = ""
   except Exception as e:
-    logger.error("_url",e)
+    logger.error("_url", traceback.format_exc())
     return False
 
   #logger.debug("_url",method,url,encoding)

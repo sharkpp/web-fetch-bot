@@ -1,8 +1,9 @@
 # buildin pacakges
-import sys
+import traceback
 # my pacakges
 from libraries.exceptions import ActionException, QuitActionException, AbortActionException
 from libraries.util import dict_set_deep
+from libraries.logger import logger
 
 """
 actions:
@@ -46,7 +47,7 @@ def _foreach(ctx, params):
   except ActionException as e:
     raise
   except Exception as e:
-    print("_foreach", e)      
+    logger.error("_foreach", traceback.format_exc())
     return False
   return True
 
@@ -64,7 +65,7 @@ def _for(ctx, params):
   except ActionException as e:
     raise
   except Exception as e:
-    print("_for", e)      
+    logger.error("_for", traceback.format_exc())
     return False
   return True
 
@@ -90,7 +91,7 @@ def _if(ctx, params):
   except ActionException as e:
     raise
   except Exception as e:
-    print("_if", e)      
+    logger.error("_if", traceback.format_exc())
     return False
   return True
 
