@@ -118,7 +118,9 @@ class Context:
 
       # 名称を印字
       if BuildinActionKey.NAME.value in action:
-        logger.info("".join([">"] * self.call_level) + " " + self.apply_vars(action[BuildinActionKey.NAME.value]))
+        name = self.apply_vars(action[BuildinActionKey.NAME.value])
+        name = name if name is not None else ""
+        logger.info("".join([">"] * self.call_level) + " " + name)
 
       self.reset_vars()
 
