@@ -1,8 +1,9 @@
 # buildin pacakges
 import argparse
 import re
+import sys
 from io import StringIO
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 # 3rd party packages
 # my pacakges
 
@@ -20,10 +21,14 @@ def parse_arguments(arguments, options):
   except:
     return None
   err = StringIO()
+  out = StringIO()
   try:
-    with redirect_stderr(err):
+    with redirect_stderr(err), redirect_stdout(out):
       args = parser.parse_args(arguments)
   except:
-    print(re.sub(r"^.+?: ", "", err.getvalue().split("\n")[1]) + "\n")
+    # エラー要因を表示
+    err_ = err.getvalue()
+    if "" != err_:
+      print(re.sub(r"^.+?: ", "", (err_+"\n\n").split("\n")[1]) + "\n")
     return None
   return args
