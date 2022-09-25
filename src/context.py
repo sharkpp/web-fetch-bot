@@ -97,8 +97,9 @@ class Context:
         # １つの変数のみを指定している場合はそのまま埋め込む
         r = var_value
         break
-      r = r[:m.start(0)+pos_offset] + str(var_value) + r[m.end(0)+pos_offset:]
-      pos_offset += len(str(var_value)) - (m.end(0) - m.start(0))
+      var_value_ = str(var_value) if var_value is not None else ""
+      r = r[:m.start(0)+pos_offset] + var_value_ + r[m.end(0)+pos_offset:]
+      pos_offset += len(var_value_) - (m.end(0) - m.start(0))
     return r
 
   def _exec_actions(self, actions):
