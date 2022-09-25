@@ -1,5 +1,6 @@
 # misc
 /recipes/*
+/tools/list.txt
 **/.*
 **/_.*
 
