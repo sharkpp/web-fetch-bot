@@ -1,4 +1,5 @@
 # buildin pacakges
+from subprocess import DEVNULL
 import sys
 import subprocess
 import atexit
@@ -9,7 +10,10 @@ proc_caffeinate = None
 def caffeinate():
 
   if "darwin" in sys.platform:
-      proc_caffeinate = subprocess.Popen("caffeinate")
+      proc_caffeinate = subprocess.Popen(
+        "caffeinate",
+        stdout=DEVNULL, stderr=DEVNULL
+      )
 
   def cleanup():
     global proc_caffeinate
