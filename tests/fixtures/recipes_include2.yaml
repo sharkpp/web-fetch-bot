@@ -1,0 +1,9 @@
+title: fixture for "include action sub recipe"
+actions:
+  - let:
+      TEST1: ${TEST}
+      TEST2: ${TEST}2
+  - exports:
+      - TEST
+      - TEST1
+      - TEST2

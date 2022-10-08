@@ -8,7 +8,7 @@ class TestActionIf(unittest.TestCase):
     def test_normal_case(self):
 
         out = run_main("recipes_if")
-        print(out)
+        #print(out)
         out = out.split("\n")
 
         self.assertEqual("RES1<class 'int'>: 1" in out, True)

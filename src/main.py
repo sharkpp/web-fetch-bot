@@ -94,7 +94,7 @@ def download_urls(urls, debug=False, recipe_dir=None):
   # load actions & recipes
   SRC_DIR = path.dirname(__file__)
   actions_cmds = load_actions(SRC_DIR)
-  recipes = load_recipes(
+  recipes, part_recipes = load_recipes(
     recipe_dir if recipe_dir is not None \
       else path.join(SRC_DIR, "..", "recipes"),
     debug=debug
@@ -115,6 +115,8 @@ def download_urls(urls, debug=False, recipe_dir=None):
       ctx.vars["TITLE"] = recipe.title
       ctx.vars["BASE_DIR"] = recipe.title
       ctx.vars["START_TIME"] = datetime.now(timezone.utc)
+      ctx.current_recipe = recipe
+      ctx.part_recipes = part_recipes
       try:
         # Url にレシピがマッチするか
         if recipe.target.search(url) is None:

@@ -65,7 +65,7 @@ def _url(ctx, params):
       method = params["method"].upper() if "method" in params else "GET"
       url = ctx.apply_vars(params["url"])
       base_url = ctx.apply_vars(params["base_url"]) if "base_url" in params else None
-      if base_url is not None:
+      if base_url is not None and "" != base_url:
         url = urljoin(base_url, url)
       encoding = params["encoding"] if "encoding" in params else None
       cookies = ctx.apply_vars(params["cookies"]) if "cookies" in params else None

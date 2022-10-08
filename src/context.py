@@ -1,6 +1,7 @@
 # buildin pacakges
 import re
 import os
+from copy import deepcopy
 from os import path
 # 3rd party packages
 import yaml
@@ -22,6 +23,8 @@ class Context:
   registerd_action_list = None
   state = None
   temporaries = None
+  current_recipe = None
+  part_recipes = None
 
   def __init__(self, action_cmds, debug=False):
     self.call_level = 0
@@ -32,6 +35,8 @@ class Context:
     self.registerd_action_list = set(action_cmds.keys())
     self.state = {}
     self.temporaries = set()
+    self.current_recipe = None
+    self.part_recipes = {}
 
   # 一時利用とマークしたファイルを削除
   def temporaries_cleanup(self):
@@ -173,3 +178,24 @@ class Context:
           }
         }))
 
+  def clone(self):
+
+    tmp_current_recipe, self.current_recipe = self.current_recipe, None
+    tmp_action_cmds, self.action_cmds = self.action_cmds, {}
+    tmp_registerd_action_list, self.registerd_action_list = self.registerd_action_list, {}
+    tmp_temporaries, self.temporaries = self.temporaries, {}
+    tmp_part_recipes, self.part_recipes = self.part_recipes, {}
+
+    ctx_ = deepcopy(self)
+
+    self.current_recipe = tmp_current_recipe
+    ctx_.current_recipe = tmp_current_recipe
+    self.action_cmds = tmp_action_cmds
+    ctx_.action_cmds = tmp_action_cmds
+    self.registerd_action_list = tmp_registerd_action_list
+    ctx_.registerd_action_list = tmp_registerd_action_list
+    self.temporaries = tmp_temporaries
+    self.part_recipes = tmp_part_recipes
+    ctx_.part_recipes = tmp_part_recipes
+
+    return ctx_

@@ -1,0 +1,13 @@
+title: fixture for "include action"
+target: https://example.net/tests/recipes_include
+actions:
+  - let:
+      TEST: AAA
+  - include:
+      path: recipes_include2
+      in:
+        TEST: TEST
+  - print:
+    - TEST
+    - TEST1
+    - TEST2
