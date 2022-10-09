@@ -34,7 +34,9 @@ def _mail_read(ctx, params):
     mail_address = ctx.apply_vars(params["mail_address"])
     read_wait = params["read_wait"] if "read_wait" in params else 1000
     timeout = params["timeout"] if "timeout" in params else 30000
-    match = params["match"]
+    match = {
+      k: ctx.apply_vars(v) for k, v in params["match"].items()
+    }
     read_opts = { "flat": True }
     if "read_num" in params:
       read_opts["max_read"] = params["read_num"] 
@@ -58,7 +60,7 @@ def _mail_read(ctx, params):
     while datetime.now(timezone.utc) < time_limit:
 
       messages = read(mail_address, **read_opts)
-      print("messages", len(messages) if messages is not None else -1)
+      logger.debug("messages", len(messages) if messages is not None else -1)
       if messages is not None:
         for message in messages:
           message_id = message["message_id"][0]
@@ -67,14 +69,14 @@ def _mail_read(ctx, params):
             result_vars = {}
             message_ids.add(message_id)
             not_matches_count = 0
-            print("------------------")
-            print("message",message)
+            logger.debug("------------------")
+            logger.debug("message",message)
             for match_target_key, match_pattern in match.items():
               match_target_values = dict_get_deep(message, match_target_key)
               for match_target_value in match_target_values:
                 m = re.fullmatch(r"/(.+?)/([is]?)", match_pattern)
-                print("~~~~~~~~~~~~~~~~~~~")
-                print("m",m,match_pattern)
+                logger.debug("~~~~~~~~~~~~~~~~~~~")
+                logger.debug("m",m,match_pattern)
                 if m is not None:
                   # フラグを構築
                   flags = 0
@@ -84,9 +86,9 @@ def _mail_read(ctx, params):
                     flags |= re.DOTALL
                   # パターンマッチ
                   mm = re.search(m.group(1), match_target_value, flags)
-                  print("mm",mm,m.group(1), match_target_value, flags)
+                  logger.debug("mm",mm,m.group(1), match_target_value, flags)
                   if mm is not None:
-                    print("mm>",mm.group(0),mm.groups())
+                    logger.debug("mm>",mm.group(0),mm.groups())
                     not_matches_count -= 1
                     #result_vars["{}".format(match_target_key)] = match_target_value
                     dict_set_deep(result_vars, match_target_key.split(".")+["0"], mm.group(0))
@@ -96,7 +98,7 @@ def _mail_read(ctx, params):
                   pass
                 not_matches_count += 1
             # 結果確認
-            print("not_matches_count",not_matches_count)
+            logger.debug("not_matches_count",not_matches_count)
             if 0 == not_matches_count:
               ctx.result_vars = result_vars
               time_limit = datetime.now(timezone.utc)
