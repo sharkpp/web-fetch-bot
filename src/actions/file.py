@@ -36,6 +36,7 @@ def _file_write(ctx, params):
   #print("_file_write",params["contents"])
   if "dest" not in params \
       or "contents" not in params:
+    logger.error("_file_write",params)
     return False
   dest = ctx.apply_vars(params["dest"])
   dest = dest\
@@ -52,7 +53,7 @@ def _file_write(ctx, params):
   base_dir = path.dirname(dest)
   #保存したいけどどこかでエラーで止まる
   #print("_file_write",base_dir)
-  if not path.exists(base_dir):
+  if 0 < len(base_dir) and not path.exists(base_dir):
     makedirs(base_dir)
   with open(dest, mode="w" if str == type(contents) else "wb") as f:
       f.write(contents)
