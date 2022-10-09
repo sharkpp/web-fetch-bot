@@ -4,6 +4,7 @@ import re
 # 3rd party packages
 import yaml
 # my pacakges
+from libraries.logger import logger
 
 """
 web-fetch-bot recipe
@@ -41,14 +42,14 @@ def load_recipes(recipe_dir, debug=False):
           if recipe.target:
             recipes[name] = recipe
             if debug:
-              print("recipe: {} <{}> loaded".format(name, recipe.title))
+              logger.debug("recipe: {} <{}> loaded".format(name, recipe.title))
           else:
             part_recipes[full_path] = recipe
             if debug:
-              print("recipe<part>: {} <{}> loaded".format(name, recipe.title))
+              logger.debug("recipe<part>: {} <{}> loaded".format(name, recipe.title))
       except Exception as e:
         if debug:
-          print("recipe load error: ", entry, e)
+          logger.debug("recipe load error: ", entry, e)
         pass
 
   return recipes, part_recipes
