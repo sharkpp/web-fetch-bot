@@ -4,6 +4,7 @@ from importlib import import_module
 from os import scandir, path
 # 3rd party packages
 # my pacakges
+from libraries.logger import logger
 
 """
 web-fetch-bot action
@@ -39,5 +40,5 @@ def load_actions(base_dir):
           )
           action_cmds.update(module.get_actions())
         except Exception as e:
-          print("skip {} by {}".format(entry.name, e))        
+          logger.debug("skip {} by {}".format(entry.name, e))        
   return action_cmds

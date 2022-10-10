@@ -147,7 +147,7 @@ def download_urls(urls, debug=False, recipe_dir=None):
 
       except Exception as e:
         if debug:
-          print(name, e)  
+          logger.debug(name, e)  
 
 if __name__ == "__main__":
   main()

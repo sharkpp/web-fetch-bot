@@ -3,6 +3,7 @@ import re
 import traceback
 # 3rd party packages
 # my pacakges
+from libraries.logger import logger
 
 """
 actions:
@@ -18,10 +19,11 @@ actions:
 
 def _match(ctx, params):
   in_text = ctx.apply_vars(params["in"])
-  pattern = ctx.apply_vars(params["pattern"])
+  pattern = ctx.apply_vars(params["pattern"].strip("/"))
   flags_ = params["flags"] if "flags" in params else ""
   out = params["out"]
   match_all = params["match_all"] if "match_all" in params else True
+  logger.debug("_match",{"in":in_text,"pattern":pattern,"flags":flags_,"out":out,"match_all":match_all})
   # フラグを構築
   flags = re.MULTILINE
   if 0 < flags_.find("i"):
@@ -31,6 +33,7 @@ def _match(ctx, params):
   # パターンマッチ
   matches = []
   for m in re.finditer(pattern, in_text, flags):
+    logger.debug("_match",{"m":m})
     # グループを辞書型に
     matches_groups = {}
     for i in range(0, len(m.groups()) + 1):

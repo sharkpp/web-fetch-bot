@@ -139,7 +139,7 @@ class Context:
       if not action_success:
         # アクションの実行に失敗
         if "skip" != action_type:
-          print("{} fail".format(action_type))
+          logger.warning("{} fail".format(action_type))
         break
 
       # 変数を作成
