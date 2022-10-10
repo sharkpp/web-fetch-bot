@@ -32,7 +32,7 @@ actions:
 
 def _let(ctx, params):
   for k, v in params.items():
-    dict_set_deep(ctx.vars, k, ctx.apply_vars(v))
+    dict_set_deep(ctx.vars, ctx.apply_vars(k), ctx.apply_vars(v))
   return True
 
 def _foreach(ctx, params):
@@ -102,11 +102,11 @@ def _print(ctx, params):
       v = ctx.vars[k]
       if type(v) == str and \
           128 < len(v):
-        print("{}{}: {}".format(k, type(v), v[:128]))
+        logger.info("{}{}: {}".format(k, type(v), v[:128]))
       else:
-        print("{}{}: {}".format(k, type(v), v))
+        logger.info("{}{}: {}".format(k, type(v), v))
     else:
-      print("{}: <None>".format(k))
+      logger.info("{}: <None>".format(k))
   return True
 
 def _abort(ctx, params):
