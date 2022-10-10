@@ -7,6 +7,10 @@ actions:
       path: recipes_include2
       in:
         TEST: TEST
+    set:
+      TEST: $TEST
+      TEST1: $TEST1
+      TEST2: $TEST2
   - print:
     - TEST
     - TEST1

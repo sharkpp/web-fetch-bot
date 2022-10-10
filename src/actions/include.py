@@ -41,7 +41,7 @@ def _include(ctx, params):
       #print("vars",vars_)
       #print("result_vars",ctx_.result_vars)
       #print("*result_vars",ctx.result_vars)
-      ctx.vars = { **ctx.vars, **vars_ }
+      ctx.result_vars = vars_
       break
 
   return True
