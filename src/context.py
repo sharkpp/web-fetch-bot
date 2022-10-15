@@ -86,14 +86,18 @@ class Context:
       return s
     r = s
     pos_offset = 0
-    for m in re.finditer(r"\$(\{([0-9a-zA-Z_.@-]+)\}|([0-9a-zA-Z_.@-]+)|\$)", s, re.MULTILINE):
+    for m in re.finditer(r"\$(\{([0-9a-zA-Z_.@*-]+)\}|([0-9a-zA-Z_.@*-]+)|\$)", s, re.MULTILINE):
       if "$" == m.group(1):
         var_name = ["$$"]
       else:
         var_name = (m.group(2) or m.group(3)).split(".")
       var_value = var_list
+      logger.debug("var_name",var_name)
       for var_name_token in var_name:
-        if var_name_token in var_value:
+        if "*" == var_name_token:
+          r = var_value
+          break
+        elif var_name_token in var_value:
           var_value = var_value[var_name_token]
         else:
           var_value = ""
@@ -105,6 +109,7 @@ class Context:
       var_value_ = str(var_value) if var_value is not None else ""
       r = r[:m.start(0)+pos_offset] + var_value_ + r[m.end(0)+pos_offset:]
       pos_offset += len(var_value_) - (m.end(0) - m.start(0))
+    logger.debug("r",r if type(r) is str else type(r))
     return r
 
   def _exec_actions(self, actions):
