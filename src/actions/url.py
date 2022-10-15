@@ -79,10 +79,19 @@ def _url(ctx, params):
       if "data" in params:
         data = {}
         for k, v in params["data"].items():
-          if v is not None:
-            data[k] = ctx.apply_vars(v)
-          else:
-            data[k] = ""
+          kk = ctx.apply_vars(k.strip("\""))
+          if type(kk) is str:
+            if v is not None:
+              data[kk] = ctx.apply_vars(v)
+            else:
+              data[kk] = ""
+          elif type(kk) is dict:
+            for kkk, vvv in kk.items():
+              data[kkk] = vvv
+      logger.debug("_url", "method/url", method, url)
+      logger.debug("_url", "headers", headers)
+      logger.debug("_url", "encoding", encoding)
+      logger.debug("_url", "data", data)
   except Exception as e:
     logger.error("_url", traceback.format_exc())
     return False
@@ -118,10 +127,6 @@ def _url(ctx, params):
   elif "POST" == method:
     # POST内容をコンテント種別ごとに処理を変えて準備
     if data is not None:
-      data_ = data
-      data = {}
-      for k, v in data_.items():
-        data[ctx.apply_vars(k)] = v
       content_Type = headers["Content-Type"].split(";")[0]
       if "application/x-www-form-urlencoded" == content_Type:
         data = urllib.parse.urlencode(data)
@@ -165,7 +170,7 @@ def _url(ctx, params):
           _url, **reqopts
         )
       except Timeout:
-        print("url", url, "timeout")
+        logger.warning("url", url, "timeout")
         return False
     response.history = history
 
@@ -216,6 +221,7 @@ def _url(ctx, params):
   logger.debug('response.request.headers:', response.request.headers)
   logger.debug('response.status_code:', response.status_code)
   logger.debug('response.headers:', response.headers)
+  logger.debug('body:', (body if type(body) is str else str(body))[0:1024])
   logger.debug("==========================")
 
   #if "Set-Cookie" in response.headers:
