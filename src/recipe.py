@@ -42,14 +42,14 @@ def load_recipes(recipe_dir, debug=False):
           if recipe.target:
             recipes[name] = recipe
             if debug:
-              logger.debug("recipe: {} <{}> loaded".format(name, recipe.title))
+              logger.info("recipe: {} <{}> loaded".format(name, recipe.title))
           else:
             part_recipes[full_path] = recipe
             if debug:
-              logger.debug("recipe<part>: {} <{}> loaded".format(name, recipe.title))
+              logger.info("recipe<part>: {} <{}> loaded".format(name, recipe.title))
       except Exception as e:
         if debug:
-          logger.debug("recipe load error: ", entry, e)
+          logger.warning("recipe load failed: ", entry, e)
         pass
 
   return recipes, part_recipes

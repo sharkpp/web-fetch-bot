@@ -57,8 +57,17 @@ def download_command(params):
   #print("args",args)
   if args is None:
     return False
-  # ログのレベル
-  if 1 < args.verbose:
+  # ログのレベルを設定
+  # -----------------------------
+  # logger.*  arg  
+  # -----------------------------
+  # DEBUG     -vv  args.verbose=2
+  # INFO      -v   args.verbose=1
+  # WARNING        args.verbose=0
+  # ERROR          args.verbose=0
+  # CRITICAL       args.verbose=0
+  # -----------------------------
+  elif 1 < args.verbose:
     logger.setLevel(logger.DEBUG)
   elif 0 < args.verbose:
     logger.setLevel(logger.INFO)
