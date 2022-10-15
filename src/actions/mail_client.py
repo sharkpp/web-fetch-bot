@@ -57,6 +57,7 @@ def _mail_read(ctx, params):
         milliseconds=timeout % 1000, microseconds=0
       )
     )
+    sleep(5) # メール受信まで適当に遅延させる
     while datetime.now(timezone.utc) < time_limit:
 
       messages = read(mail_address, **read_opts)
