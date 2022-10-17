@@ -205,6 +205,8 @@ function cron() {
   echo "------------------------------"
 }
 
+# stdout -> $LOG_PATH
+# stderr -> console
 cat $LIST_FILE | grep -vE "^\s*#" | \
 while read DAY MONTH DoW URL ; do
   #echo DAY=$DAY MONTH=$MONTH DoW=$DoW URL=$URL
