@@ -188,7 +188,7 @@ class Context:
     tmp_current_recipe, self.current_recipe = self.current_recipe, None
     tmp_action_cmds, self.action_cmds = self.action_cmds, {}
     tmp_registerd_action_list, self.registerd_action_list = self.registerd_action_list, {}
-    tmp_temporaries, self.temporaries = self.temporaries, {}
+    tmp_temporaries, self.temporaries = self.temporaries, set()
     tmp_part_recipes, self.part_recipes = self.part_recipes, {}
 
     ctx_ = deepcopy(self)

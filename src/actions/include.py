@@ -28,6 +28,7 @@ def _include(ctx, params):
       #print("part_path*",part_path, part_recipe)
       ctx_ = ctx.clone()
       ctx_.vars = { **ctx_.vars, **in_vars }
+
       # レシピ内のアクションを順に処理
       ctx_._exec_actions(part_recipe.actions)
       vars_ = {
@@ -35,13 +36,19 @@ def _include(ctx, params):
           for key, value in ctx_.vars.items() \
             if PREFIX_INCLUDE_VARIABLE_NAME == key[0:len(PREFIX_INCLUDE_VARIABLE_NAME)]
       }
+
       # 状態を保存
       ctx.state = ctx_.state
       ctx.save_state()
+
+      # 一時ファイルをクリーン
+      ctx_.temporaries_cleanup()
+
       #print("vars",vars_)
       #print("result_vars",ctx_.result_vars)
       #print("*result_vars",ctx.result_vars)
       ctx.result_vars = vars_
+
       break
 
   return True
