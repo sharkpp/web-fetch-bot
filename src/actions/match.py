@@ -23,7 +23,7 @@ def _match(ctx, params):
   flags_ = params["flags"] if "flags" in params else ""
   out = params["out"]
   match_all = params["match_all"] if "match_all" in params else True
-  logger.debug("_match",{"in":in_text,"pattern":pattern,"flags":flags_,"out":out,"match_all":match_all})
+  logger.debug("_match",{"in":in_text[0:1024],"pattern":pattern,"flags":flags_,"out":out,"match_all":match_all})
   # フラグを構築
   flags = re.MULTILINE
   if 0 < flags_.find("i"):
