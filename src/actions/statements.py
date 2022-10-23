@@ -15,7 +15,7 @@ actions:
   - name: "hoge download, simple"
     foreach:
       let: I
-      in: LIST
+      in: $LIST
       do:
         - name: "hoge download, simple"
           action: web_read
@@ -37,7 +37,7 @@ def _let(ctx, params):
 
 def _foreach(ctx, params):
   try:
-    in_var = ctx.vars[params["in"]]
+    in_var = ctx.apply_vars(params["in"])
     let_var = params["let"]
     do_actions = params["do"]
     for v in in_var:
