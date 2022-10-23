@@ -46,7 +46,8 @@ def _pdf_from_dir(ctx, params):
         page.drawImage(page_file, 0, 0, *pagesize)
         page.showPage()
       except Exception as e:
-        print("skip {} by {}".format(entry.name, e))
+        logger.error("skip {} by {}".format(entry.name, e))
+        return False
     # PDFファイルとして保存
     page.save()
     # 日付を変更
