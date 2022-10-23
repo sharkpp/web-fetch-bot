@@ -179,7 +179,7 @@ class Context:
         f.write(yaml.dump({
           "state": {
             "version": 1,
-            "done": list(state)
+            "done": sorted(list(state))
           }
         }))
 
