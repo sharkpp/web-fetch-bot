@@ -131,7 +131,7 @@ def download_urls(urls, debug=False, recipe_dir=None):
         if recipe.target.search(url) is None:
           continue
         if debug:
-          print("{} ========".format(recipe.title))
+          logger.debug("{} ========".format(recipe.title))
 
         # レシピ内のアクションを順に処理
         ctx._exec_actions(recipe.actions)
