@@ -11,7 +11,7 @@ from libraries.logger import logger
 """
 actions:
   - name: "json "
-    replace:
+    json.parse:
       in: $HOGE
       out: HOGE
       format: json
@@ -42,6 +42,7 @@ def jsToDict(tree):
 class JsonFormatType(Enum):
   JSON = "json"
   JSONC = "jsonc"
+  LDJSON = "ldjson"
   JS = "js"
 
 def _json_parse(ctx, params):
@@ -52,13 +53,18 @@ def _json_parse(ctx, params):
     if JsonFormatType.JSONC.value == format:
       # /* .. */ や // を削除する
       in_str = re.sub(r'/\*[\s\S]*?\*/|//.*', '', in_str)
-      ctx.vars[out_var] = json.loads(in_str)
+      r = json.loads(in_str)
     elif JsonFormatType.JS.value == format:
       r = parse("const x = " + in_str)
       r = r["body"][0]["declarations"][0]["init"]
-      ctx.vars[out_var] = jsToDict(r)
+      r = jsToDict(r)
+    elif JsonFormatType.LDJSON.value == format:
+      r = []
+      for j in in_str.splitlines():
+        r.append(json.loads(j))
     else:
-      ctx.vars[out_var] = json.loads(in_str)
+      r = json.loads(in_str)
+    ctx.vars[out_var] = r
     # フラグを構築
   except Exception as e:
     logger.error("_json_parse", traceback.format_exc())
