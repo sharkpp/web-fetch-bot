@@ -124,6 +124,8 @@ def download_urls(urls, debug=False, recipe_dir=None):
       ctx.vars["TITLE"] = recipe.title
       ctx.vars["BASE_DIR"] = recipe.title
       ctx.vars["START_TIME"] = datetime.now(timezone.utc)
+      ctx.vars["RECIPE_PATH"] = recipe.path
+      ctx.vars["RECIPE_DIR"] = path.dirname(recipe.path)
       ctx.current_recipe = recipe
       ctx.part_recipes = part_recipes
       try:
