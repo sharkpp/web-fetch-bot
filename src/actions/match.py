@@ -21,7 +21,7 @@ def _match(ctx, params):
   in_text = ctx.apply_vars(params["in"])
   pattern = ctx.apply_vars(params["pattern"].strip("/"))
   flags_ = params["flags"] if "flags" in params else ""
-  out = params["out"]
+  out = params["out"] if "out" in params else {}
   match_all = params["match_all"] if "match_all" in params else True
   logger.debug("_match",{"in":in_text[0:1024],"pattern":pattern,"flags":flags_,"out":out,"match_all":match_all})
   # フラグを構築
@@ -39,7 +39,7 @@ def _match(ctx, params):
     for i in range(0, len(m.groups()) + 1):
       matches_groups[str(i)] = m.group(i)
     # マッチした内容を指定された構造に
-    match = {}
+    match = {**matches_groups}
     for k, v in out.items():
       match[k] = ctx._apply_vars({**matches_groups, **ctx.vars}, v)
     matches.append(match)
