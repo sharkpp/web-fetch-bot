@@ -36,6 +36,8 @@ def _exec(ctx, params):
       ]
     timeout = params["timeout"] if "timeout" in params else None
     cwd = ctx.apply_vars(params["cwd"]) if "cwd" in params else path.dirname(ctx.current_recipe.path)
+    stdin = ctx.apply_vars(params["stdin"]) if "stdin" in params else None
+    encoding = params["encoding"] if "encoding" in params else None
 
     if 0 < len(cwd) and not path.exists(cwd):
       makedirs(cwd)
@@ -45,14 +47,15 @@ def _exec(ctx, params):
 
     r = subprocess.run(
         tuple(list([command]) + args),
+        input=stdin,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         cwd=cwd,
         timeout=timeout,
-        check=False, text=True
+        check=False, text=False
       )
-    #logger.debug(r)
-    ctx.result_vars["stdout"] = r.stdout
-    ctx.result_vars["stderr"] = r.stderr
+
+    ctx.result_vars["stdout"] = r.stdout.decode(encoding) if encoding is not None and encoding != "binary" else r.stdout
+    ctx.result_vars["stderr"] = r.stderr.decode(encoding) if encoding is not None and encoding != "binary" else r.stderr
 
   except Exception as e:
     logger.error("_exec", traceback.format_exc())
