@@ -2,7 +2,7 @@
 import traceback
 # my pacakges
 from libraries.exceptions import ActionException, QuitActionException, AbortActionException
-from libraries.util import dict_set_deep
+from libraries.util import dict_get_deep, dict_set_deep
 from libraries.logger import logger
 
 """
@@ -98,8 +98,8 @@ def _if(ctx, params):
 def _print(ctx, params):
   target = params if params is not None and 0 < len(params) else ctx.vars.keys()
   for k in target:
-    if k in ctx.vars:
-      v = ctx.vars[k]
+    v = dict_get_deep(ctx.vars, k)
+    if v is not None:
       if type(v) == str and \
           128 < len(v):
         logger.info("{}{}: {}".format(k, type(v), v[:128]))
