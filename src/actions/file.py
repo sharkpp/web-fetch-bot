@@ -83,6 +83,27 @@ def _file_read(ctx, params):
     logger.error("_file_read", traceback.format_exc())
   return True
 
+def _path_normalize(ctx, params):
+
+  if type(params) is str:
+    in_ = ctx.apply_vars(params)
+  else:
+    in_ = ctx.apply_vars(params["in"])
+
+  ctx.result_vars["$$"] = (in_
+    .replace('/', '／')
+    .replace(':', '：')
+    .replace(';', '；')
+    .replace('&', '＆')
+    .replace('<', '＜')
+    .replace('>', '＞')
+    .replace('|', '｜')
+    .replace('#', '＃')
+    .replace('\\', '￥')
+  )
+
+  return True
+
 def get_actions():
   """
   Returns a list of the actions it is providing
@@ -90,4 +111,5 @@ def get_actions():
   return {
     "file.write": _file_write,
     "file.read": _file_read,
+    "path.normalize": _path_normalize,
   }
