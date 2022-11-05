@@ -14,15 +14,32 @@ web-fetch-bot recipe
 # class define
 
 class Recipe:
+
   title = None
   target = None
   actions = None
   path = None
+
   def __init__(self, recipe, path):
     self.title = recipe["title"]
     self.actions = recipe["actions"]
-    self.target = re.compile(recipe["target"]) if "target" in recipe else None
     self.path = path
+    self.target = None
+    if "target" in recipe:
+      self.target = []
+      for target in (
+          recipe["target"] \
+            if type(recipe["target"]) is list \
+            else [ recipe["target"] ]
+          ):
+        self.target.append(re.compile(target))
+
+  def match(self, url):
+    for target in self.target:
+      if target.search(url) is not None:
+        return True
+    return False
+
 
 # exports
 

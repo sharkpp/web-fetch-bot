@@ -130,8 +130,9 @@ def download_urls(urls, debug=False, recipe_dir=None):
       ctx.part_recipes = part_recipes
       try:
         # Url にレシピがマッチするか
-        if recipe.target.search(url) is None:
+        if not recipe.match(url):
           continue
+
         if debug:
           logger.debug("{} ========".format(recipe.title))
 
