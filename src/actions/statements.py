@@ -69,6 +69,20 @@ def _for(ctx, params):
     return False
   return True
 
+def _while(ctx, params):
+  try:
+    condition = params["condition"]
+    do_actions = params["do"]
+    while eval(ctx.apply_vars(condition), {}, ctx.vars):
+      ctx._exec_actions(do_actions)
+
+  except ActionException as e:
+    raise
+  except Exception as e:
+    logger.error("_while", traceback.format_exc())
+    return False
+  return True
+
 def _if(ctx, params):
   try:
     condition = ctx.apply_vars(params["condition"])
@@ -123,6 +137,7 @@ def get_actions():
     "let": _let,
     "foreach": _foreach,
     "for": _for,
+    "while": _while,
     "if": _if,
     "print": _print,
     "abort": _abort,

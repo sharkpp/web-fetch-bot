@@ -1,0 +1,15 @@
+title: fixture for "while action"
+target: https://example.net/tests/recipes_while1
+actions:
+
+  - let:
+      I: 0
+  - name: "while"
+    while:
+      condition: "$I < 5"
+      do:
+        - print:
+            - I
+        - calc:
+            expr: "$I + 1"
+          set: I
