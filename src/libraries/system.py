@@ -8,6 +8,7 @@ from time import sleep
 proc_caffeinate = None
 
 def caffeinate():
+  global proc_caffeinate
 
   if "darwin" in sys.platform:
       proc_caffeinate = subprocess.Popen(
