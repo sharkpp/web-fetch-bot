@@ -64,6 +64,21 @@ def _format(ctx, params):
     return False
   return True
 
+def _html_entity_decode(ctx, params):
+  try:
+    in_ = ctx.apply_vars(params["in"])
+    ctx.result_vars["$$"] = (in_
+      .replace('&nbsp;', ' ')
+      .replace('&quot;', '"')
+      .replace('&lt;',   '<')
+      .replace('&gt;',   '>')
+      .replace('&amp;',  '&')
+    )
+  except Exception as e:
+    logger.error("_html_entity_decode", traceback.format_exc())
+    return False
+  return True
+
 def get_actions():
   """
   Returns a list of the actions it is providing
@@ -71,4 +86,5 @@ def get_actions():
   return {
     "replace": _replace,
     "format": _format,
+    "html_entity.decode": _html_entity_decode,
   }
