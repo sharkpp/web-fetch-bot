@@ -4,8 +4,13 @@ function print_help() {
   echo "usage: $0 [OPTIONS] LIST_FILE"
   echo "OPTIONS:"
   echo "  -h, --help  show this message"
-  echo "  -l LOG_DIR, --log-dir"
+  echo "  -f, --force"
+  echo "  -l LOG_DIR, --log-dir LOG_DIR"
   echo "              LOG_DIR  set log output directory"
+  echo "  -d DATE, --date DATE"
+  echo "              DATE  set date, default is current date"
+  echo "  -n, --dry-run"
+  echo "              not effective"
   echo ""
   echo "LIST_FILE format:"
   echo "|# day  mon week URL"
@@ -27,23 +32,33 @@ fi
 
 # parse arguments
 OPT_LOG_DIR=./logs
-while getopts hl:-: opt option
+OPT_DATE=
+OPT_DRY_RUN=0
+OPT_FORCE=0
+while getopts hnfl:d:-: OPTION
 do
-  optarg="$OPTARG"
-  if [[ "$opt" = - ]]; then
-      opt="-${OPTARG%%=*}"
-      optarg="${OPTARG/${OPTARG%%=*}/}"
-      optarg="${optarg#=}"
-      if [[ -z "$optarg" ]] && [[ ! "${!OPTIND}" = -* ]]; then
-          optarg="${!OPTIND}"
+  OPTARG_="$OPTARG"
+  # support long option by '-' option
+  if [[ "$OPTION" = - ]]; then
+      OPTION="-${OPTARG%%=*}"
+      OPTARG_="${OPTARG_/${OPTARG%%=*}/}"
+      OPTARG_="${OPTARG_#=}"
+      if [[ -z "$OPTARG_" ]] && [[ ! "${!OPTIND}" = -* ]]; then
+          OPTARG_="${!OPTIND}"
           shift
       fi
   fi
-  case $option in
+  case "-$OPTION" in
     -h|--help)
       print_help ;;
     -l|--log-dir)
-      OPT_LOG_DIR=${OPTARG} ;;
+      OPT_LOG_DIR=${OPTARG_} ;;
+    -d|--date)
+      OPT_DATE="-d ${OPTARG_}" ;;
+    -n|--dry-run)
+      OPT_DRY_RUN=1 ;;
+    -f|--force)
+      OPT_FORCE=1 ;;
     \?)
       echo "This is unexpected option." 1>&2
       print_help
@@ -76,6 +91,9 @@ echo "------------------------------"
 echo "LOG DIR  : $OPT_LOG_DIR"
 echo "LOG FILE : $LOG_PATH"
 echo "LIST FILE: $LIST_FILE"
+if [ 0 -ne $OPT_DRY_RUN ]; then
+  echo "DRY RUN  : true"
+fi
 echo "------------------------------"
 ) | tee -a $LOG_PATH 1>&2
 
@@ -122,15 +140,15 @@ function cron() {
   local URL=$1
   local DAYS=$2
   local MONTHS=$3
-  local DoWS=$3
+  local DoWS=$4
   if [ "7" == "$DoWS" ]; then DoWS=0 ; fi
   # 0=Sunday, 1=Monday, ...
 
   # get today part
-  local TODAY_DAY=$($_date +"%d")
-  local TODAY_MONTH=$($_date +"%m")
+  local TODAY_DAY=$($_date $OPT_DATE +"%d")
+  local TODAY_MONTH=$($_date $OPT_DATE +"%m")
   local TODAY_MONTH=${TODAY_MONTH#0}
-  local TODAY_DoW=$(LANG=C $_date +"%u")
+  local TODAY_DoW=$(LANG=C $_date $OPT_DATE +"%u")
   if [ "7" == "$TODAY_DoW" ]; then TODAY_DoW=0 ; fi
   #echo $TODAY_DAY $TODAY_MONTH $TODAY_DoW
   local MATCH=0 # full match is 7
@@ -141,7 +159,7 @@ function cron() {
     LIST=
     case $TYPE in
       "DAYS")   ITEM=$DAYS
-                LIST=$(eval "echo {1..$(echo $($_date +"%d" -d"`$_date +"%Y%m01"` 1 days ago + 1 month"))}")
+                LIST=$(eval "echo {1..$(echo $($_date $OPT_DATE +"%d" -d"`$_date $OPT_DATE +"%Y%m01"` 1 days ago + 1 month"))}")
                 ;;
       "MONTHS") ITEM=$MONTHS
                 LIST="1 2 3 4 5 6 7 8 9 10 11 12"
@@ -192,7 +210,9 @@ function cron() {
     # check today and target
     echo "TARGET  : $URL"
     t0=$($_date +'%s.%3N')
-    python3 $ROOT_DIR/src/main.py -vv $1 2>&1
+    if [ 0 -eq $OPT_DRY_RUN ]; then
+      python3 $ROOT_DIR/src/main.py -vv $1 2>&1
+    fi
     #sleep 1
     t1=$($_date +'%s.%3N')
     td=$(echo $(($(echo $t1 - $t0 | sed -e "s/\.//g"))) | sed -e "s/\(...\)$/.\1/g" -e "s/^\./0./g")
@@ -213,6 +233,10 @@ while read DAY MONTH DoW URL ; do
   if [ "" != "$URL" ]; then
     # stdout ... to log file
     # stderr ... to termal
-    cron "$URL" "$DAY" "$MONTH" "$DoW"
+    if [ 0 -ne $OPT_FORCE ]; then
+      cron "$URL" "*" "*" "*"
+    else
+      cron "$URL" "$DAY" "$MONTH" "$DoW"
+    fi
   fi
 done >> $LOG_PATH
