@@ -17,7 +17,7 @@ actions:
 
 def _query_selector(ctx, params):
   try:
-    in_str = ctx.apply_vars(params["in"])
+    in_str = str(ctx.apply_vars(params["in"]))
     selector = ctx.apply_vars(params["selector"])
     # prefix fallback
     selector = selector.replace(":contains(", ":-soup-contains(") # The pseudo class ':contains' is deprecated, ':-soup-contains' should be used moving forward.
