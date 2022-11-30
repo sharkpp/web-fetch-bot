@@ -3,6 +3,7 @@ import traceback
 # 3rd party packages
 from bs4 import BeautifulSoup
 # my pacakges
+from libraries.logger import logger
 
 """
 actions:
@@ -30,6 +31,8 @@ def _query_selector(ctx, params):
     soup = BeautifulSoup(in_str, parser_type)
     elms = soup.select(selector)
     matches = []
+    html = ""
+    text = ""
     for elm in elms:
       if elm is not None:
         attrs = {
@@ -37,6 +40,8 @@ def _query_selector(ctx, params):
           "@html": elm,
           "@text": elm.get_text(),
         }
+        html = html + str(elm)
+        text = text + elm.get_text()
         for attr_name in elm.attrs:
           attrs[attr_name] = elm[attr_name]
         matches.append(attrs)
@@ -46,7 +51,10 @@ def _query_selector(ctx, params):
       ctx.result_vars["match"] = matches[0] if 0 < len(matches) else {}
     else:
       ctx.result_vars["matches"] = matches
+    ctx.result_vars["html"] = html
+    ctx.result_vars["text"] = text
   except Exception:
+    logger.error("_query_selector", traceback.format_exc())
     return False  
   return True
 
