@@ -99,6 +99,9 @@ def _path_normalize(ctx, params):
     .replace('>', '＞')
     .replace('|', '｜')
     .replace('#', '＃')
+    .replace('!', '！')
+    .replace('?', '？')
+    .replace('"', '”')
     .replace('\\', '￥')
   )
 
