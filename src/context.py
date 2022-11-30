@@ -68,10 +68,10 @@ class Context:
     """
     if type(vars_list) == str:
       # 文字列の場合は $ をもとに設定
-      dict_set_deep(self.vars, vars_list, self._apply_vars(self.result_vars, "$$"))
+      dict_set_deep(self.vars, vars_list, self._apply_vars({**self.vars, **self.result_vars}, "$$"))
     else:
       for name, s in vars_list.items():
-        dict_set_deep(self.vars, name, self._apply_vars(self.result_vars, s))
+        dict_set_deep(self.vars, name, self._apply_vars({**self.vars, **self.result_vars}, s))
 
   def apply_vars(self, s):
     """
