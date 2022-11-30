@@ -25,9 +25,13 @@ def _exec(ctx, params):
     command = ctx.apply_vars(params["command"])
     args = params["args"]
     if type(args) is str:
+      logger.debug("args",args)
+      for m in re.finditer(r"(\"?)([^ ]+|[^\"]+)\1 ?", ctx.apply_vars(args)):
+        logger.debug("args[]",m)
+
       args = [
-        ctx.apply_vars(m[2])
-        for m in re.finditer(r"(\"?)([^ ]+|[^\"]+)\1 ?", args)
+        m[2]
+        for m in re.finditer(r"(\"?)([^ ]+|[^\"]+)\1 ?", ctx.apply_vars(args))
       ]
     else:
       args = [
