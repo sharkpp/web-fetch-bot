@@ -7,7 +7,36 @@ class TestActionCalc(unittest.TestCase):
 
     def test_normal_case(self):
 
-        out = run_main("recipes_calc")
+        out = run_main("""
+title: fixture for "calc action"
+actions:
+  - let:
+      A: 10
+      B: 20
+  - calc:
+      expr: "$A + $B"
+    set: C
+  - print:
+    - C
+
+  - calc:
+      expr: "$A*($B+$C)"
+    set: D
+  - print:
+    - D
+
+  - calc:
+      expr: "2022-09-02 14:42:22.784901+00:00 + 1.5s"
+    set: E
+  - print:
+    - E
+
+  - calc:
+      expr: "2022-09-02 14:42:22.784901+00:00 - 10min"
+    set: F
+  - print:
+    - F
+""")
         #print(out)
         out = out.split("\n")
 

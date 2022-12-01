@@ -1,9 +1,0 @@
-title: fixture for "let action"
-target: https://example.net/tests/recipes_let
-actions:
-  - let:
-      A: 10
-      B.x: 20
-  - print:
-    - A
-    - B

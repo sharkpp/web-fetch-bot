@@ -7,7 +7,16 @@ class TestActionLet(unittest.TestCase):
 
     def test_normal_case(self):
 
-        out = run_main("recipes_let")
+        out = run_main("""
+title: fixture for "let action"
+actions:
+  - let:
+      A: 10
+      B.x: 20
+  - print:
+    - A
+    - B
+""")
         out = out.split("\n")
 
         self.assertEqual("A<class 'int'>: 10" in out, True)

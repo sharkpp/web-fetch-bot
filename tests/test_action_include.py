@@ -7,7 +7,7 @@ class TestActionInclude(unittest.TestCase):
 
     def test_normal_case(self):
 
-        out = run_main("recipes_include")
+        out = run_main("recipes_include", use_fixture_dir=True)
         #print("out-----",out,"------")
         out = out.split("\n")
 
