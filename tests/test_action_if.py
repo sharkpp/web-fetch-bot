@@ -76,6 +76,7 @@ actions:
       S1: "abef"
       S2: "abcdef"
       S3: "abbef"
+      S4: "ab/xef"
   - if:
       condition: "/ab.+ef/ == '$S1'"
       then:
@@ -91,10 +92,22 @@ actions:
       then:
         - let:
             RES3: 1
+  - if:
+      condition: "/ab\\\/.+ef/ == '$S3'"
+      then:
+        - let:
+            RES4: 1
+  - if:
+      condition: "/ab\\\/.+ef/ == '$S4'"
+      then:
+        - let:
+            RES5: 1
   - print:
       - RES1
       - RES2
       - RES3
+      - RES4
+      - RES5
 """)
         #print("----",out,"----")
         out = out.split("\n")
@@ -102,6 +115,7 @@ actions:
         self.assertEqual("RES1<class 'int'>: 1" not in out, True)
         self.assertEqual("RES2<class 'int'>: 1" in out, True)
         self.assertEqual("RES3<class 'int'>: 1" in out, True)
+        self.assertEqual("RES4<class 'int'>: 1" not in out, True)
 
 if __name__ == '__main__':
     unittest.main()

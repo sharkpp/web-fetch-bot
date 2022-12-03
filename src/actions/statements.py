@@ -1,5 +1,6 @@
 # buildin pacakges
 import traceback
+import re
 # my pacakges
 from libraries.exceptions import ActionException, QuitActionException, AbortActionException
 from libraries.util import dict_get_deep, dict_set_deep
@@ -29,6 +30,23 @@ actions:
       let: I
       do:
 """
+
+
+def my_eval_match(pattern, test):
+  return re.search(pattern, test) is not None
+
+def my_eval(ctx, condition):
+  cond = ctx.apply_vars(condition)
+  # /hoge/ == "hoge" or "hoge" == /hoge/
+  # /hoge/ != "hoge" or "hoge" != /hoge/
+  cond = re.sub(r"(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*\')\s*(==|!=)\s*/((?:\\.|[^/\\])*)/", '_match\\2(r"\\3",\\1)', cond)
+  cond = re.sub(r"/((?:\\.|[^/\\])*)/\s*(==|!=)\s*(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*\')", '_match\\2(r\'\\1\',\\3)', cond)
+  cond = re.sub(r"_match==", '_match', cond)
+  cond = re.sub(r"_match!=", 'not _match', cond)
+  #
+  return eval(cond, {
+      "_match": my_eval_match
+    }, ctx.vars)
 
 def _let(ctx, params):
   for k, v in params.items():
@@ -73,7 +91,7 @@ def _while(ctx, params):
   try:
     condition = params["condition"]
     do_actions = params["do"]
-    while eval(ctx.apply_vars(condition), {}, ctx.vars):
+    while my_eval(ctx, condition):
       ctx._exec_actions(do_actions)
 
   except ActionException as e:
@@ -85,11 +103,11 @@ def _while(ctx, params):
 
 def _if(ctx, params):
   try:
-    condition = ctx.apply_vars(params["condition"])
+    condition = params["condition"]
     then_ = params["then"]
     else_ = params["else"] if "else" in params else []
     elif_ = params["elif"] if "elif" in params else None
-    if eval(condition, {}, ctx.vars):
+    if my_eval(ctx, condition):
       ctx._exec_actions(then_)
     else:
       if elif_ is not None and \
@@ -106,6 +124,50 @@ def _if(ctx, params):
     raise
   except Exception as e:
     logger.error("_if", traceback.format_exc())
+    return False
+  return True
+
+def _switch(ctx, params):
+  try:
+    # switch:
+    #   var: $HOGE
+    #   cases:
+    #     - case: "5"
+    #       do:
+    #         - :
+    #     :
+    #   default:
+    #     do:
+    #       - :
+    var_ = ctx.apply_vars(params["var"]) \
+            if "var" in params and type(params["var"]) is str \
+            else None
+    cases = params["cases"]
+    default_ = params["default"] \
+            if "default" in params and \
+              type(params["default"]) is dict \
+            else None
+    #
+    case_mached = False
+    for case_ in cases:
+      condition = case_["case"] + \
+                  ("==" + var_ if var_ is not None else "")
+      if my_eval(ctx, condition):
+        ctx._exec_actions(case_["do"])
+        case_mached = True
+        break
+    if False == case_mached and \
+        default_ is not None:
+      ctx._exec_actions(default_["do"])
+
+    #print("condition",condition)
+    #print("then_",then_)
+    #print("else_",else_)
+    #print("elselif_e_",elif_)
+  except ActionException as e:
+    raise
+  except Exception as e:
+    logger.error("_switch", traceback.format_exc())
     return False
   return True
 
@@ -139,6 +201,7 @@ def get_actions():
     "for": _for,
     "while": _while,
     "if": _if,
+    "switch": _switch,
     "print": _print,
     "abort": _abort,
     "quit": _quit,
