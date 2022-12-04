@@ -37,7 +37,11 @@ def dict_set_deep(store, name_or_keys, data):
     if type(value) not in [list, dict]:
       value = value_stack[len(value_stack)-2][names_stack[len(value_stack)-1]] = {}
       value_stack[len(value_stack)-1] = value
-    if name_token not in value:
+    if name_token.isdecimal() and \
+        type(value) is list and \
+        int(name_token) < len(value):
+      name_token = int(name_token)
+    elif name_token not in value:
       value_stack[len(value_stack)-1][name_token] = {}
       value = value_stack[len(value_stack)-1]
     value_stack.append(value[name_token])
