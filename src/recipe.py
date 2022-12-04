@@ -20,10 +20,14 @@ class Recipe:
   actions = None
   path = None
 
-  def __init__(self, recipe, path):
-    self.title = recipe["title"]
+  def __init__(self, recipe, path_):
+    if recipe is None:
+      raise ValueError
+    self.title = recipe["title"] \
+      if "title" is not recipe \
+      else path.splitext(path.basename(path_))[0]
     self.actions = recipe["actions"]
-    self.path = path
+    self.path = path_
     self.target = None
     if "target" in recipe:
       self.target = []
