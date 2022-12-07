@@ -24,7 +24,7 @@ class Recipe:
     if recipe is None:
       raise ValueError
     self.title = recipe["title"] \
-      if "title" is not recipe \
+      if "title" != recipe \
       else path.splitext(path.basename(path_))[0]
     self.actions = recipe["actions"]
     self.path = path_
