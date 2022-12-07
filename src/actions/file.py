@@ -2,6 +2,7 @@
 from os import makedirs, path, stat, utime
 import json
 import traceback
+import re
 # 3rd party packages
 import yaml
 # my pacakges
@@ -90,20 +91,23 @@ def _path_normalize(ctx, params):
   else:
     in_ = ctx.apply_vars(params["in"])
 
-  ctx.result_vars["$$"] = (in_
-    .replace('/', '／')
-    .replace(':', '：')
-    .replace(';', '；')
-    .replace('&', '＆')
-    .replace('<', '＜')
-    .replace('>', '＞')
-    .replace('|', '｜')
-    .replace('#', '＃')
-    .replace('!', '！')
-    .replace('?', '？')
-    .replace('"', '”')
-    .replace('\\', '￥')
-  )
+  in_ = in_.replace('/', '／')
+  in_ = in_.replace(':', '：')
+  in_ = in_.replace(';', '；')
+  in_ = in_.replace('&', '＆')
+  in_ = in_.replace('<', '＜')
+  in_ = in_.replace('>', '＞')
+  in_ = in_.replace('|', '｜')
+  in_ = in_.replace('#', '＃')
+  in_ = in_.replace('!', '！')
+  in_ = in_.replace('?', '？')
+  in_ = in_.replace('"', '”')
+  in_ = in_.replace('\\', '￥')
+  in_ = in_.replace('\.', '￥')
+  in_ = re.sub(r'\.+$', '．', in_)
+  in_ = re.sub(r'[ \uE000-\uF8FF]+', '', in_)
+
+  ctx.result_vars["$$"] = in_
 
   return True
 
