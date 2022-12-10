@@ -38,6 +38,7 @@ def _exec(ctx, params):
         ctx.apply_vars(str(arg))
           for arg in args
       ]
+    args = [ arg for arg in args if arg is not None and arg != "" ]
     timeout = params["timeout"] if "timeout" in params else None
     cwd = ctx.apply_vars(params["cwd"]) if "cwd" in params else path.dirname(ctx.current_recipe.path)
     stdin = ctx.apply_vars(params["stdin"]) if "stdin" in params else None
