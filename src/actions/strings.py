@@ -28,7 +28,7 @@ def _replace(ctx, params):
     flags_ = params["flags"] if "flags" in params else ""
     old_str = params["old"]
     old_re = params["old"].strip("/")
-    new_str = params["new"] # キャプチャは ${99} 形式
+    new_str = ctx.apply_vars(params["new"]) # キャプチャは ${99} 形式
     # フラグを構築
     flags = re.MULTILINE
     if 0 < flags_.find("i"):
@@ -47,7 +47,7 @@ def _replace(ctx, params):
     else:
       # テキストを置換
       ctx.result_vars["$$"] = \
-        ctx.apply_vars(in_str.replace(old_str, new_str))
+        ctx.apply_vars(in_str.replace(ctx.apply_vars(old_str), new_str))
   except Exception as e:
     logger.error("_replace", traceback.format_exc())
     return False
