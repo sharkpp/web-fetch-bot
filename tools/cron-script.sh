@@ -205,13 +205,17 @@ function cron() {
     # 対象外
     echo "TARGET  : $URL"
     echo "STATUS  : SKIP"
-    echo "SKIP-----------: $URL" 1>&2
+    #echo "SKIP-----------: $URL" 1>&2
   else
     # check today and target
     echo "TARGET  : $URL"
+    echo "$URL" 1>&2
     t0=$($_date +'%s.%3N')
     if [ 0 -eq $OPT_DRY_RUN ]; then
-      python3 $ROOT_DIR/src/main.py -vv $1 2>&1
+#     python3 $ROOT_DIR/src/main.py -vv $1 2>&1
+      (
+        python3 $ROOT_DIR/src/main.py -vv $1 2>&1 | \
+          tee /dev/stderr ) 2> >( grep "完了 " | sed -e "s/^/  /g" 1>&2 )
     fi
     #sleep 1
     t1=$($_date +'%s.%3N')
@@ -220,7 +224,8 @@ function cron() {
     echo "END     : $($_date -d "@${t1}" +'%Y-%m-%d %H:%M:%S.%3N (%:z)')"
     eval "echo ELAPSED : -------- $($_date -ud "@$td" +'$((%s/3600/24)) %H:%M:%S.%3N')"
     echo "STATUS  : COMPLETE"
-    echo "$(eval "echo $($_date -ud "@$td" +'$((%s/3600/24))d %H:%M:%S.%3N')"): $URL" 1>&2
+    #echo "$(eval "echo $($_date -ud "@$td" +'$((%s/3600/24))d %H:%M:%S.%3N')"): $URL" 1>&2
+    echo "  >> $(eval "echo $($_date -ud "@$td" +'$((%s/3600/24))d %H:%M:%S.%3N')")" 1>&2
   fi
   echo "------------------------------"
 }
