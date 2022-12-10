@@ -105,7 +105,8 @@ def _path_normalize(ctx, params):
   in_ = in_.replace('\\', '￥')
   in_ = in_.replace('\.', '￥')
   in_ = re.sub(r'\.+$', '．', in_)
-  in_ = re.sub(r'[ \uE000-\uF8FF]+', '', in_)
+  in_ = re.sub(r'[　 \uE000-\uF8FF]+', ' ', in_)
+  in_ = re.sub(r' +$', '', in_)
 
   ctx.result_vars["$$"] = in_
 
