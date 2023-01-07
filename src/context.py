@@ -16,28 +16,19 @@ web-fetch-bot context
 """
 
 class Context:
-  call_level = 0
-  debug = False
-  vars = None
-  result_vars = None
-  action_cmds = None
-  registerd_action_list = None
-  state = None
-  temporaries = None
-  current_recipe = None
-  part_recipes = None
 
   def __init__(self, action_cmds, debug=False):
-    self.call_level = 0
-    self.debug = debug
-    self.vars = {}
-    self.result_vars = {}
-    self.action_cmds = action_cmds
+    self.call_level     = 0
+    self.debug          = debug
+    self.vars           = {}
+    self.result_vars    = {}
+    self.action_cmds    = action_cmds
     self.registerd_action_list = set(action_cmds.keys())
-    self.state = {}
-    self.temporaries = set()
+    self.state          = {}
+    self.temporaries    = set()
     self.current_recipe = None
-    self.part_recipes = {}
+    self.part_recipes   = {}
+    self.sub_dir        = ""
 
   # 一時利用とマークしたファイルを削除
   def temporaries_cleanup(self):

@@ -1,4 +1,5 @@
 # buildin pacakges
+import re
 from os import path, stat, utime
 from datetime import datetime, timezone, timedelta
 from sys import version_info
@@ -33,3 +34,22 @@ def touch_file(dest, timestamp = None):
         break
     utime(path=dest, times=(sr.st_atime, \
       (timestamp + timestamp.astimezone(local_tz).utcoffset()).timestamp()))
+
+def normalize_path(in_):
+  in_ = in_.replace('/', '／')
+  in_ = in_.replace(':', '：')
+  in_ = in_.replace(';', '；')
+  in_ = in_.replace('&', '＆')
+  in_ = in_.replace('<', '＜')
+  in_ = in_.replace('>', '＞')
+  in_ = in_.replace('|', '｜')
+  in_ = in_.replace('#', '＃')
+  in_ = in_.replace('!', '！')
+  in_ = in_.replace('?', '？')
+  in_ = in_.replace('"', '”')
+  in_ = in_.replace('\\', '￥')
+  in_ = in_.replace('\.', '￥')
+  in_ = re.sub(r'\.+$', '．', in_)
+  in_ = re.sub(r'[　 \uE000-\uF8FF]+', ' ', in_)
+  in_ = re.sub(r' +$', '', in_)
+  return in_

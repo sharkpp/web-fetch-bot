@@ -6,7 +6,7 @@ import re
 # 3rd party packages
 import yaml
 # my pacakges
-from libraries.file_util import touch_file
+from libraries.file_util import touch_file, normalize_path
 from libraries.logger import logger
 
 """
@@ -39,46 +39,43 @@ def _file_write(ctx, params):
       or "contents" not in params:
     logger.error("_file_write",params)
     return False
-  dest = ctx.apply_vars(params["dest"])
-  dest = dest\
-    .replace('"', "") \
-    .replace("\\", "￥") \
-    .replace(':', "：") \
-    .replace('?', "？") \
-    .replace('*', "＊") \
-    .replace('<', "＜").replace('>', "＞") \
-    .replace('|', "｜")
+  dest_path = ctx.apply_vars(params["dest"])
+  dest_path = normalize_path(dest_path)
+  dest_path = path.join(ctx.sub_dir, dest_path)
   contents = ctx.apply_vars(params["contents"])
   timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
   is_temporary = True if "temporary" in params and True == params["temporary"] else False
-  base_dir = path.dirname(dest)
+  base_dir = path.dirname(dest_path)
   #保存したいけどどこかでエラーで止まる
-  #print("_file_write",base_dir)
   if 0 < len(base_dir) and not path.exists(base_dir):
     makedirs(base_dir)
-  with open(dest, mode="w" if str == type(contents) else "wb") as f:
+  with open(dest_path, mode="w" if str == type(contents) else "wb") as f:
       f.write(contents)
   if timestamp is not None:
     # ファイルのタイムスタンプを指定のものに変更
-    touch_file(dest, timestamp)
+    touch_file(dest_path, timestamp)
   if is_temporary:
-    ctx.temporaries.add(dest)
+    ctx.temporaries.add(dest_path)
   return True
 
 def _file_read(ctx, params):
-  src = ctx.apply_vars(params["src"])
-  type_ = params["type"]
-  encoding = params["encoding"] if "encoding" in params else "utf8"
+  src_path = ctx.apply_vars(params["src"])
+  src_path = path.join(ctx.sub_dir, src_path)
+  type_ = params["type"] if "type" in params else "binary"
+  encoding = params["encoding"] if "encoding" in params else "binary"
   #
   try:
     data = None
-    with open(src, mode="rb") as file:
+    print(type_)
+    with open(src_path, mode="rb") as file:
       if "json" == type_:
         data = json.load(file)
       elif "yaml" == type_:
         data = yaml.safe_load(file)
+      elif "binary" == encoding:
+        data = file.read()
       else:
-        data = file.read().encode(encoding)
+        data = file.read().decode(encoding)
     ctx.result_vars["$$"] = data
   except Exception as e:
     logger.error("_file_read", traceback.format_exc())
@@ -91,24 +88,7 @@ def _path_normalize(ctx, params):
   else:
     in_ = ctx.apply_vars(params["in"])
 
-  in_ = in_.replace('/', '／')
-  in_ = in_.replace(':', '：')
-  in_ = in_.replace(';', '；')
-  in_ = in_.replace('&', '＆')
-  in_ = in_.replace('<', '＜')
-  in_ = in_.replace('>', '＞')
-  in_ = in_.replace('|', '｜')
-  in_ = in_.replace('#', '＃')
-  in_ = in_.replace('!', '！')
-  in_ = in_.replace('?', '？')
-  in_ = in_.replace('"', '”')
-  in_ = in_.replace('\\', '￥')
-  in_ = in_.replace('\.', '￥')
-  in_ = re.sub(r'\.+$', '．', in_)
-  in_ = re.sub(r'[　 \uE000-\uF8FF]+', ' ', in_)
-  in_ = re.sub(r' +$', '', in_)
-
-  ctx.result_vars["$$"] = in_
+  ctx.result_vars["$$"] = normalize_path(in_)
 
   return True
 

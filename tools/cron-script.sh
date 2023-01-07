@@ -136,11 +136,16 @@ function cron() {
   local ITEM
   local LIST
   local STEP
+  local OPT
   
   local URL=$1
   local DAYS=$2
   local MONTHS=$3
   local DoWS=$4
+  local SUBDIR=$5
+  if [ "" != "$SUBDIR" ]; then
+    OPT="$OPT --sub-dir $SUBDIR"
+  fi
   if [ "7" == "$DoWS" ]; then DoWS=0 ; fi
   # 0=Sunday, 1=Monday, ...
 
@@ -214,7 +219,7 @@ function cron() {
     if [ 0 -eq $OPT_DRY_RUN ]; then
 #     python3 $ROOT_DIR/src/main.py -vv $1 2>&1
       (
-        python3 $ROOT_DIR/src/main.py -vv $1 2>&1 | \
+        python3 $ROOT_DIR/src/main.py $OPT -vv $1 2>&1 | \
           tee /dev/stderr ) 2> >( grep "完了 " | sed -e "s/^/  /g" 1>&2 )
     fi
     #sleep 1
@@ -233,15 +238,15 @@ function cron() {
 # stdout -> $LOG_PATH
 # stderr -> console
 cat $LIST_FILE | grep -vE "^\s*#" | \
-while read DAY MONTH DoW URL ; do
+while read DAY MONTH DoW URL SUBDIR ; do
   #echo DAY=$DAY MONTH=$MONTH DoW=$DoW URL=$URL
   if [ "" != "$URL" ]; then
     # stdout ... to log file
     # stderr ... to termal
     if [ 0 -ne $OPT_FORCE ]; then
-      cron "$URL" "*" "*" "*"
+      cron "$URL" "*" "*" "*" ""
     else
-      cron "$URL" "$DAY" "$MONTH" "$DoW"
+      cron "$URL" "$DAY" "$MONTH" "$DoW" "$SUBDIR"
     fi
   fi
 done >> $LOG_PATH

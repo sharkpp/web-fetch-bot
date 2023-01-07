@@ -7,7 +7,7 @@ import traceback
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, portrait
 # my pacakges
-from libraries.file_util import touch_file
+from libraries.file_util import touch_file, normalize_path
 from libraries.logger import logger
 
 """
@@ -21,11 +21,14 @@ actions:
 def _pdf_from_dir(ctx, params):
   try:
     in_dir = ctx.apply_vars(params["in"])
+    in_dir = path.join(ctx.sub_dir, in_dir)
     dest_path = ctx.apply_vars(params["dest"])
+    dest_path = normalize_path(dest_path)
+    dest_path = path.join(ctx.sub_dir, dest_path)
     timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
     base_dir = path.dirname(dest_path)
     # PDF生成開始
-    if not path.exists(base_dir):
+    if 0 < len(base_dir) and not path.exists(base_dir):
       makedirs(base_dir)
     pagesize = portrait(A4)
     page = canvas.Canvas(\

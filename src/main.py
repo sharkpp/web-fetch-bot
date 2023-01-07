@@ -42,6 +42,7 @@ optional arguments:
 OPTIONS
   -v*,  --verbose   show verbose messages
   -r, --recipe-dir  set recipe dir
+  -s, --sub-dir     set sub dir name
 """ % (
     sys.argv[0]
   ))
@@ -52,6 +53,7 @@ def download_command(params):
     [ "urls",               { "nargs": "+" } ],
     [ "-v", "--verbose",    { "dest": "verbose", "action": "count", "default": 0 } ],
     [ "-r", "--recipe-dir", { "dest": "recipe_dir" } ],
+    [ "-s", "--sub-dir",    { "dest": "sub_dir" } ],
   ])
   # 引数解析結果確認
   #print("args",args)
@@ -77,7 +79,8 @@ def download_command(params):
   download_urls(
     args.urls,
     debug=1<args.verbose,
-    recipe_dir=args.recipe_dir
+    recipe_dir=args.recipe_dir,
+    sub_dir=args.sub_dir
   )
   return True
 
@@ -98,7 +101,7 @@ def main():
   else:
     print_help()
 
-def download_urls(urls, debug=False, recipe_dir=None):
+def download_urls(urls, debug=False, recipe_dir=None, sub_dir=None):
 
   # load actions & recipes
   SRC_DIR = path.dirname(__file__)
@@ -108,8 +111,6 @@ def download_urls(urls, debug=False, recipe_dir=None):
       else path.join(SRC_DIR, "..", "recipes"),
     debug=debug
   )
-
-  #-------------------------------------------
   # main
 
   caffeinate()
@@ -120,14 +121,15 @@ def download_urls(urls, debug=False, recipe_dir=None):
     # Url にマッチするレシピを探して処理
     for name, recipe in recipes.items():
       ctx = Context(actions_cmds, debug=debug)
-      ctx.vars["URL"] = url
-      ctx.vars["TITLE"] = recipe.title
-      ctx.vars["BASE_DIR"] = recipe.title
-      ctx.vars["START_TIME"] = datetime.now(timezone.utc)
+      ctx.vars["URL"]         = url
+      ctx.vars["TITLE"]       = recipe.title
+      ctx.vars["BASE_DIR"]    = recipe.title
+      ctx.vars["START_TIME"]  = datetime.now(timezone.utc)
       ctx.vars["RECIPE_PATH"] = recipe.path
-      ctx.vars["RECIPE_DIR"] = path.dirname(recipe.path)
-      ctx.current_recipe = recipe
-      ctx.part_recipes = part_recipes
+      ctx.vars["RECIPE_DIR"]  = path.dirname(recipe.path)
+      ctx.current_recipe      = recipe
+      ctx.part_recipes        = part_recipes
+      ctx.sub_dir             = sub_dir if sub_dir is not None else ""
       try:
         # Url にレシピがマッチするか
         if not recipe.match(url):
