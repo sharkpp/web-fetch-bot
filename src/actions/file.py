@@ -41,7 +41,6 @@ def _file_write(ctx, params):
     return False
   dest_path = ctx.apply_vars(params["dest"])
   dest_path = normalize_path(dest_path)
-  dest_path = path.join(ctx.sub_dir, dest_path)
   contents = ctx.apply_vars(params["contents"])
   timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
   is_temporary = True if "temporary" in params and True == params["temporary"] else False
@@ -60,7 +59,6 @@ def _file_write(ctx, params):
 
 def _file_read(ctx, params):
   src_path = ctx.apply_vars(params["src"])
-  src_path = path.join(ctx.sub_dir, src_path)
   type_ = params["type"] if "type" in params else "binary"
   encoding = params["encoding"] if "encoding" in params else "binary"
   #

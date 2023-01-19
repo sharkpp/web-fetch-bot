@@ -2,7 +2,7 @@
 import re
 import os
 from copy import deepcopy
-from os import path
+from os import path, makedirs
 # 3rd party packages
 import yaml
 # my pacakges
@@ -28,7 +28,6 @@ class Context:
     self.temporaries    = set()
     self.current_recipe = None
     self.part_recipes   = {}
-    self.sub_dir        = ""
 
   # 一時利用とマークしたファイルを削除
   def temporaries_cleanup(self):
@@ -167,6 +166,10 @@ class Context:
     DL状態を保存
     """
     for fname, state in self.state.items():
+      print("save_state",fname)
+      base_dir = path.dirname(fname)
+      if 0 < len(base_dir) and not path.exists(base_dir):
+        makedirs(base_dir)
       with open(fname, mode="w") as f:
         f.write(yaml.dump({
           "state": {

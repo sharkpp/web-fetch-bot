@@ -1,6 +1,6 @@
 # buildin pacakges
 from contextlib import redirect_stderr
-from os import path
+from os import makedirs, path, getcwd, chdir
 from datetime import datetime, timezone
 import logging
 import re
@@ -115,25 +115,36 @@ def download_urls(urls, debug=False, recipe_dir=None, sub_dir=None):
 
   caffeinate()
 
+  cur_dir = getcwd()
+
   # 指定された Url を順に処理
   for url in urls:
     #print("{} ------".format(url))
     # Url にマッチするレシピを探して処理
     for name, recipe in recipes.items():
-      ctx = Context(actions_cmds, debug=debug)
-      ctx.vars["URL"]         = url
-      ctx.vars["TITLE"]       = recipe.title
-      ctx.vars["BASE_DIR"]    = recipe.title
-      ctx.vars["START_TIME"]  = datetime.now(timezone.utc)
-      ctx.vars["RECIPE_PATH"] = recipe.path
-      ctx.vars["RECIPE_DIR"]  = path.dirname(recipe.path)
-      ctx.current_recipe      = recipe
-      ctx.part_recipes        = part_recipes
-      ctx.sub_dir             = sub_dir if sub_dir is not None else ""
       try:
         # Url にレシピがマッチするか
         if not recipe.match(url):
           continue
+
+        # コンテキスト作成
+        ctx = Context(actions_cmds, debug=debug)
+        ctx.vars["URL"]         = url
+        ctx.vars["TITLE"]       = recipe.title
+        ctx.vars["BASE_DIR"]    = recipe.title
+        ctx.vars["START_TIME"]  = datetime.now(timezone.utc)
+        ctx.vars["RECIPE_PATH"] = recipe.path
+        ctx.vars["RECIPE_DIR"]  = path.dirname(recipe.path)
+        ctx.current_recipe      = recipe
+        ctx.part_recipes        = part_recipes
+
+        # 作業ディレクトリを移動(なければ作る)
+        cwd = path.join(cur_dir, sub_dir or "")
+        try:
+          chdir(cwd)
+        except FileNotFoundError as e:
+          makedirs(cwd)
+          chdir(cwd)
 
         if debug:
           logger.debug("{} ========".format(recipe.title))
@@ -152,16 +163,23 @@ def download_urls(urls, debug=False, recipe_dir=None, sub_dir=None):
         ctx.save_state()
         # 一時ファイルをクリーン
         ctx.temporaries_cleanup()
+        # 作業ディレクトリをもどす
+        chdir(cur_dir)
         # 指示された場所で終了
         sys.exit()
 
       except AbortActionException as e:
+        # 作業ディレクトリをもどす
+        chdir(cur_dir)
         # 中断
         sys.exit()
 
       except Exception as e:
         if debug:
           logger.debug(name, e)  
+
+  # 作業ディレクトリをもどす
+  chdir(cur_dir)
 
 if __name__ == "__main__":
   main()
