@@ -22,7 +22,7 @@ def _pdf_from_dir(ctx, params):
   try:
     in_dir = ctx.apply_vars(params["in"])
     dest_path = ctx.apply_vars(params["dest"])
-    dest_path = normalize_path(dest_path)
+    #dest_path = normalize_path(dest_path)
     timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
     base_dir = path.dirname(dest_path)
     # PDF生成開始

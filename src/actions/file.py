@@ -40,7 +40,7 @@ def _file_write(ctx, params):
     logger.error("_file_write",params)
     return False
   dest_path = ctx.apply_vars(params["dest"])
-  dest_path = normalize_path(dest_path)
+  #dest_path = normalize_path(dest_path)
   contents = ctx.apply_vars(params["contents"])
   timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
   is_temporary = True if "temporary" in params and True == params["temporary"] else False
