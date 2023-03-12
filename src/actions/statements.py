@@ -1,6 +1,7 @@
 # buildin pacakges
 import traceback
 import re
+from copy import deepcopy
 # my pacakges
 from libraries.exceptions import ActionException, QuitActionException, AbortActionException
 from libraries.util import dict_get_deep, dict_set_deep
@@ -49,8 +50,21 @@ def my_eval(ctx, condition):
     }, ctx.vars)
 
 def _let(ctx, params):
-  for k, v in params.items():
-    dict_set_deep(ctx.vars, ctx.apply_vars(k), ctx.apply_vars(v))
+  try:
+    for k, v in params.items():
+      if "[]" == k[len(k)-2:len(k)]:
+        # キーの末尾に [] がついている場合は配列への追加指示とする
+        k = k[0:len(k)-2]
+        tmp = dict_get_deep(ctx.vars, ctx.apply_vars(k))
+        if type(tmp) is not list:
+          tmp = []
+        tmp.append(deepcopy(ctx.apply_vars(v)))
+        dict_set_deep(ctx.vars, ctx.apply_vars(k), tmp)
+      else:
+        dict_set_deep(ctx.vars, ctx.apply_vars(k), deepcopy(ctx.apply_vars(v)))
+  except Exception as e:
+    logger.error("_foreach", traceback.format_exc())
+    return False
   return True
 
 def _foreach(ctx, params):
