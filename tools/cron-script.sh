@@ -244,7 +244,7 @@ while read DAY MONTH DoW URL SUBDIR ; do
     # stdout ... to log file
     # stderr ... to termal
     if [ 0 -ne $OPT_FORCE ]; then
-      cron "$URL" "*" "*" "*" ""
+      cron "$URL" "*" "*" "*" "$SUBDIR"
     else
       cron "$URL" "$DAY" "$MONTH" "$DoW" "$SUBDIR"
     fi
