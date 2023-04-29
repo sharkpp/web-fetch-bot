@@ -59,6 +59,7 @@ def _exec(ctx, params):
         check=False, text=False
       )
 
+    ctx.result_vars["returncode"] = r.returncode
     ctx.result_vars["stdout"] = r.stdout.decode(encoding) if encoding is not None and encoding != "binary" else r.stdout
     ctx.result_vars["stderr"] = r.stderr.decode(encoding) if encoding is not None and encoding != "binary" else r.stderr
 
