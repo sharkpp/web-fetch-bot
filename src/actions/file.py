@@ -48,7 +48,10 @@ def _file_write(ctx, params):
   #保存したいけどどこかでエラーで止まる
   if 0 < len(base_dir) and not path.exists(base_dir):
     makedirs(base_dir)
-  with open(dest_path, mode="w" if str == type(contents) else "wb") as f:
+  with open(dest_path, mode="w" if str == type(contents) or dict == type(contents) else "wb") as f:
+    if dict == type(contents):
+      f.write(json.dumps(contents))
+    else:
       f.write(contents)
   if timestamp is not None:
     # ファイルのタイムスタンプを指定のものに変更
