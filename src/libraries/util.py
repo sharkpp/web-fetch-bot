@@ -12,7 +12,9 @@ def dict_get_deep(store, name_or_keys, defaultValue=None):
   # 順番に辿って値を取得
   value = store
   for name_token in name_tokens:
-    if value is not None and\
+    if "*" == name_token:
+      break
+    elif value is not None and\
        name_token in value:
       value = value[name_token]
     else:

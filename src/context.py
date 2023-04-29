@@ -77,7 +77,17 @@ class Context:
       return s
     r = s
     pos_offset = 0
-    for m in re.finditer(r"\$(\{([0-9a-zA-Z_.@-]+|\*)\}|([0-9a-zA-Z_.@-]+|\*)|\$)", s, re.MULTILINE):
+    # match of
+    #   ${abc123}
+    #   ${abXX23}
+    #   ${AAAA}
+    #   ${AAAA.fuga}
+    #   ${HOGE.*}
+    #   $TEST.x.y
+    #   $TEST.*
+    #   $TEST*
+    #   $$
+    for m in re.finditer(r"\$(\{((?:[0-9a-zA-Z_@-]+|\*)(?:\.(?:[0-9a-zA-Z_@-]+|\*))*)\}|((?:[0-9a-zA-Z_@-]+|\*)(?:\.(?:[0-9a-zA-Z_@-]+|\*))*)|\$)", s, re.MULTILINE):
       if "$" == m.group(1):
         var_name = ["$$"]
       else:
