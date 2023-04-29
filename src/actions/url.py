@@ -153,6 +153,7 @@ def _url(ctx, params):
     _url = url
     while 300 == (math.floor(response.status_code / 100) * 100):
       history.append(response)
+      history[len(history)-1].request.headers["cookie"] = cookies.get_dict() if cookies is not None else dict()
       if re.search(r"^http:\/\/.+", response.headers["Location"][0]) is None: # 相対URL
         _url = urljoin(_url, response.headers["Location"])
       else: # 絶対URL
@@ -173,6 +174,7 @@ def _url(ctx, params):
         logger.warning("url", url, "timeout")
         return False
     response.history = history
+    response.request.headers["cookie"] = cookies.get_dict() if cookies is not None else dict()
 
   if encoding is None:
     if HEADER_CONTENT_TYPE in response.headers:
@@ -213,6 +215,7 @@ def _url(ctx, params):
     logger.debug('history<'+str(i)+'>.request.headers:', hist.request.headers)
     logger.debug('history<'+str(i)+'>.status_code:', hist.status_code)
     logger.debug('history<'+str(i)+'>.headers:', hist.headers)
+    logger.debug('history<'+str(i)+'>.cookies:', hist.cookies.get_dict())
     logger.debug("--------------------------")
   logger.debug('url:', url)
   logger.debug('response.url:', response.url)
@@ -221,6 +224,7 @@ def _url(ctx, params):
   logger.debug('response.request.headers:', response.request.headers)
   logger.debug('response.status_code:', response.status_code)
   logger.debug('response.headers:', response.headers)
+  logger.debug('response.cookies:', response.cookies.get_dict())
   logger.debug('body:', (body if type(body) is str else str(body))[0:1024])
   logger.debug("==========================")
 
