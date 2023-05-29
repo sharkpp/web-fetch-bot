@@ -1,9 +1,25 @@
-title: fixture for "include action sub recipe"
+title: fixture for "include action2"
+target: https://example.net/tests/recipes_include2
 actions:
   - let:
-      TEST1: ${TEST}
-      TEST2: ${TEST}2
-  - exports:
-      - TEST
-      - TEST1
-      - TEST2
+      BASE_DIR: recipes_include2
+  - for:
+      start: 1
+      end: 20
+      step: 1
+      let: I
+      do:
+        - skip: _$I
+        - include:
+            path: recipes_include2-sub
+            in:
+              TEST: _$I
+          set:
+            TEST: $TEST
+            TEST1: $TEST1
+            TEST2: $TEST2
+        - print:
+          - I
+          - TEST
+          - TEST1
+          - TEST2

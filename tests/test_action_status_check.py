@@ -49,5 +49,27 @@ actions:
 
         self.assertEqual(st.st_size > 0, True)
 
+    def test_status_check3(self):
+
+        out = run_main("""
+title: fixture for "status check action"
+actions:
+  - let:
+      BASE_DIR: test
+  - skip: test
+  - skip: test
+  - name: OK
+    mark.ok: test
+  - skip: test
+  - name: OK2
+    mark.ok: test
+""")
+        #print("@@@@",out)
+        #out = out.split("\n")
+
+        st = os.stat(path.join(TEMP_DIR, "test", "state.yaml"))
+
+        self.assertEqual(st.st_size > 0, True)
+
 if __name__ == '__main__':
     unittest.main()

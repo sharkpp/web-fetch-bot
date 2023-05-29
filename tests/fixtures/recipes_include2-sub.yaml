@@ -1,0 +1,11 @@
+title: fixture for "include action sub recipe2"
+actions:
+  - skip: ${TEST}
+  - let:
+      TEST1: ${TEST}1
+      TEST2: ${TEST}2
+  - exports:
+      - TEST
+      - TEST1
+      - TEST2
+  - mark.ok: ${TEST}

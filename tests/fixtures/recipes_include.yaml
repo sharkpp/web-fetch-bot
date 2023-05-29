@@ -2,9 +2,10 @@ title: fixture for "include action"
 target: https://example.net/tests/recipes_include
 actions:
   - let:
+      BASE_DIR: recipes_include
       TEST: AAA
   - include:
-      path: recipes_include2
+      path: recipes_include-sub
       in:
         TEST: TEST
     set:

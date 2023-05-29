@@ -1,9 +1,9 @@
 # buildin pacakges
 import unittest
 # my pacakges
-from common import run_main
+from common import MyTestCase, run_main
 
-class TestActionWhile(unittest.TestCase):
+class TestActionWhile(MyTestCase):
 
     def test_normal_case(self):
 
