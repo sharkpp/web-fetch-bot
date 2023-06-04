@@ -35,7 +35,7 @@ state.yaml file format
 DEFAULT_STATE_FILENAME = "state.yaml"
 
 def get_state_params(ctx, params):
-  print("state_path")
+  #print("state_path")
   if isinstance(params, str):
     key = ctx.apply_vars(params)
     state_path = path.join(ctx.vars["BASE_DIR"], DEFAULT_STATE_FILENAME)
@@ -50,7 +50,7 @@ def get_state_params(ctx, params):
         state_path = path.join(path_, DEFAULT_STATE_FILENAME)
       else:
         state_path = path_
-  print("state_path",state_path)
+  #print("state_path",state_path)
   return (state_path, key)
 
 def _skip(ctx, params):

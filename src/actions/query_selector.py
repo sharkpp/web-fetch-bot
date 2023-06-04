@@ -37,7 +37,7 @@ def _query_selector(ctx, params):
       if elm is not None:
         attrs = {
           "@tag": elm.tag,
-          "@html": elm,
+          "@html": str(elm),
           "@text": elm.get_text(),
         }
         html = html + str(elm)
