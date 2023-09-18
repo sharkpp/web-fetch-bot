@@ -158,9 +158,10 @@ def _url(ctx, params):
         _url = urljoin(_url, response.headers["Location"])
       else: # 絶対URL
         _url = response.headers["Location"]
-      #logger.debug(">>>",_url)
-      #logger.debug(">>>",response.cookies.keys())
-      #logger.debug(">>>",reqopts["cookies"].keys())
+      logger.debug(">>>",_url)
+      logger.debug(">>>",response.cookies.keys())
+      logger.debug(">>>",reqopts)
+      logger.debug(">>>",reqopts["cookies"].keys() if hasattr(reqopts, "cookies") else None)
       # クッキーを更新する
       if "cookies" not in reqopts:
         cookies = reqopts["cookies"] = response.cookies
@@ -171,8 +172,12 @@ def _url(ctx, params):
           _url, **reqopts
         )
       except Timeout:
-        logger.warning("url", url, "timeout")
+        logger.warning(">>>url", url, "timeout")
         return False
+      except Exception as err:
+        logger.warning(">>>url", url, err)
+        return False
+      logger.debug(">>>------------")
     response.history = history
     response.request.headers["cookie"] = cookies.get_dict() if cookies is not None else dict()
 
@@ -184,9 +189,9 @@ def _url(ctx, params):
       else:
         encoding = "binary"
 
-  #logger.debug(response.status_code)    # HTTPのステータスコード取得
-  #logger.debug(response.text)    # レスポンスのHTMLを文字列で取得
-  #logger.debug(response.headers)
+  logger.debug(response.status_code)    # HTTPのステータスコード取得
+  logger.debug(response.text[0:64])    # レスポンスのHTMLを文字列で取得
+  logger.debug(response.headers)
 
   # Last-Modified: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT
   # >> https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Last-Modified

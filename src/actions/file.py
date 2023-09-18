@@ -22,7 +22,7 @@ actions:
       dest: hoge.txt
       contents: 
         hoge $FUGA
-      encode: utf8
+      encoding: utf8
   - name: "hoge read"
     file.read:
       src: hoge.json
@@ -44,13 +44,29 @@ def _file_write(ctx, params):
   contents = ctx.apply_vars(params["contents"])
   timestamp = ctx.apply_vars(params["timestamp"]) if "timestamp" in params else None
   is_temporary = True if "temporary" in params and True == params["temporary"] else False
+  encoding = ctx.apply_vars(params["encoding"]) if "encoding" in params else None
   base_dir = path.dirname(dest_path)
   #保存したいけどどこかでエラーで止まる
   if 0 < len(base_dir) and not path.exists(base_dir):
     makedirs(base_dir)
-  with open(dest_path, mode="w" if str == type(contents) or dict == type(contents) else "wb") as f:
-    if dict == type(contents):
-      f.write(json.dumps(contents))
+  with open(dest_path, mode="wb" if bytes == type(contents) else "w") as f:
+    # encoding | type(contents)     | file
+    # ---------+--------------------+--------
+    # None     | bytes              | bytes
+    # None     | string             | string
+    # None     | dict / .get_dict() | JSON
+    # "json"   | dict / .get_dict() | JSON
+    # "yaml"   | dict / .get_dict() | YAML
+    contents_ = contents
+    if hasattr(contents, "get_dict"):
+      contents_ = contents.get_dict()
+    elif bytes != type(contents):
+      contents_ = str(contents)
+    if dict == type(contents_):
+      if "json" == encoding or encoding is None:
+        f.write(json.dumps(contents_))
+      elif "yaml" == encoding:
+        f.write(yaml.dump(contents_))
     else:
       f.write(contents)
   if timestamp is not None:

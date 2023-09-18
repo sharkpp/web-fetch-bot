@@ -145,6 +145,7 @@ def download_urls(urls, debug=False, recipe_dir=None, sub_dir=None):
         except FileNotFoundError as e:
           makedirs(cwd)
           chdir(cwd)
+        ctx.vars["CWD"]  = cwd
 
         if debug:
           logger.debug("{} ========".format(recipe.title))

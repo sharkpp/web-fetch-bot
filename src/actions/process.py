@@ -23,7 +23,7 @@ actions:
 def _exec(ctx, params):
   try:
     command = ctx.apply_vars(params["command"])
-    args = params["args"]
+    args = ctx.apply_vars(params["args"])
     if type(args) is str:
       logger.debug("args",args)
       for m in re.finditer(r"(\"?)([^ ]+|[^\"]+)\1 ?", ctx.apply_vars(args)):
