@@ -98,8 +98,13 @@ class Context:
         if "*" == var_name_token:
           r = var_value
           break
-        elif var_name_token in var_value:
+        elif  type(var_value) == dict and \
+              var_name_token in var_value:
           var_value = var_value[var_name_token]
+        elif  type(var_value) == list and \
+              0 <= int(var_name_token) and \
+              int(var_name_token) < len(var_value):
+          var_value = var_value[int(var_name_token)]
         else:
           var_value = ""
           break

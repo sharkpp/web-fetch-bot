@@ -117,5 +117,34 @@ actions:
         self.assertEqual("RES3<class 'int'>: 1" in out, True)
         self.assertEqual("RES4<class 'int'>: 1" not in out, True)
 
+    def test_array_case(self):
+
+        out = run_main("""
+title: fixture for "if action"
+actions:
+  - let:
+      S1: '{"a":["A","B"]}'
+  - json.parse:
+      in: $S1
+      out: S2
+      format: json
+  - let:
+      S3: ${S2.a.0}
+  - if:
+      condition: "'A' == '$S2.a.0'"
+      then:
+        - let:
+            RES1: 1
+  - print:
+      - S1
+      - S2
+      - S3
+      - RES1
+""")
+        print("----",out,"----")
+        out = out.split("\n")
+
+        self.assertEqual("RES1<class 'int'>: 1" in out, True)
+
 if __name__ == '__main__':
     unittest.main()
