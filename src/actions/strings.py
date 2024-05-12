@@ -78,6 +78,16 @@ def _html_entity_decode(ctx, params):
     return False
   return True
 
+def _join(ctx, params):
+  try:
+    in_ = ctx.apply_vars(params["in"])
+    sep_ = ctx.apply_vars(params["sep"])
+    ctx.result_vars["$$"] = sep_.join(in_)
+  except Exception as e:
+    logger.error("_html_entity_decode", traceback.format_exc())
+    return False
+  return True
+
 def get_actions():
   """
   Returns a list of the actions it is providing
@@ -86,4 +96,5 @@ def get_actions():
     "replace": _replace,
     "format": _format,
     "html_entity.decode": _html_entity_decode,
+    "join": _join,
   }
