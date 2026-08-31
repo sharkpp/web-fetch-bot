@@ -70,6 +70,32 @@ def print_roundtrip(response, *args, **kwargs):
         reshdrs=format_headers(response.headers), 
     ))
 
+def _set_post_data(reqopts, headers, data):
+  content_type_header = next(
+    (key for key in headers if key.lower() == HEADER_CONTENT_TYPE.lower()),
+    None,
+  )
+  content_type = (
+    headers[content_type_header].split(";", 1)[0].strip().lower()
+    if content_type_header is not None
+    else None
+  )
+
+  if "application/x-www-form-urlencoded" == content_type:
+    reqopts["data"] = urllib.parse.urlencode(data)
+  elif "application/json" == content_type:
+    reqopts["data"] = json.dumps(data)
+  elif "multipart/form-data" == content_type:
+    # requests に Content-Type と boundary を生成させる。
+    # (None, value) はファイル名を付けず、通常のフォーム項目として送る指定。
+    del headers[content_type_header]
+    reqopts["files"] = {
+      key: (None, value)
+      for key, value in data.items()
+    }
+  else:
+    reqopts["data"] = data
+
 def _url(ctx, params):
   #print("_url",params)
   try:
@@ -146,12 +172,7 @@ def _url(ctx, params):
     elif "POST" == method:
       # POST内容をコンテント種別ごとに処理を変えて準備
       if data is not None:
-        content_Type = headers["Content-Type"].split(";")[0]
-        if "application/x-www-form-urlencoded" == content_Type:
-          data = urllib.parse.urlencode(data)
-        elif "application/json" == content_Type:
-          data = json.dumps(data)
-        reqopts["data"] = data
+        _set_post_data(reqopts, headers, data)
       # POST
       try:
         response = req.post(
@@ -170,6 +191,8 @@ def _url(ctx, params):
       history = []
       if "data" in reqopts:
         del reqopts["data"]
+      if "files" in reqopts:
+        del reqopts["files"]
       _url = url
       while 300 == (math.floor(response.status_code / 100) * 100):
         history.append(response)
