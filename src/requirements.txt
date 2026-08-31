@@ -1,3 +1,6 @@
+# usage: pip install -r requirements.txt
+# usage[uninstall all]: pip freeze | xargs pip uninstall -y
+
 pyyaml
 requests
 pyjsparser

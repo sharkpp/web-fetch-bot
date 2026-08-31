@@ -6,6 +6,7 @@ import re
 import urllib
 import math
 import traceback
+import textwrap
 # 3rd party packages
 import requests
 from requests.exceptions import Timeout
@@ -48,6 +49,26 @@ UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, l
 url_match = re.compile("^((GET|POST)\s+)?(https?:\/\/.+)$")
 
 requests.adapters.DEFAULT_RETRIES = 5
+
+def print_roundtrip(response, *args, **kwargs):
+    format_headers = lambda d: '\n'.join(f'{k}: {v}' for k, v in d.items())
+    logger.info(textwrap.dedent('''
+        ---------------- request ----------------
+        {req.method} {req.url}
+        {reqhdrs}
+
+        {req.body}
+        ---------------- response ----------------
+        {res.status_code} {res.reason} {res.url}
+        {reshdrs}
+
+        ...
+    ''').format(
+        req=response.request, 
+        res=response, 
+        reqhdrs=format_headers(response.request.headers), 
+        reshdrs=format_headers(response.headers), 
+    ))
 
 def _url(ctx, params):
   #print("_url",params)
@@ -117,6 +138,7 @@ def _url(ctx, params):
       try:
         response = req.get(
           url, **reqopts
+          , hooks={'response': print_roundtrip}
         )
       except Timeout:
         logger.warning("url", url, "timeout")
@@ -134,6 +156,7 @@ def _url(ctx, params):
       try:
         response = req.post(
           url, **reqopts
+          , hooks={'response': print_roundtrip}
         )
       except Timeout:
         logger.error("url", url, "timeout")
@@ -168,6 +191,7 @@ def _url(ctx, params):
         try:
           response = req.get(
             _url, **reqopts
+          , hooks={'response': print_roundtrip}
           )
         except Timeout:
           logger.warning(">>>url", url, "timeout")
@@ -177,7 +201,9 @@ def _url(ctx, params):
           return False
         logger.debug(">>>------------")
       response.history = history
-      response.request.headers["cookie"] = cookies.get_dict() if cookies is not None else dict()
+      response.request.headers["cookie"] = \
+        cookies.get_dict() if type(cookies) is requests.cookies.RequestsCookieJar \
+          else cookies if type(cookies) is dict else dict()
 
     if encoding is None:
       if HEADER_CONTENT_TYPE in response.headers:
@@ -226,6 +252,7 @@ def _url(ctx, params):
     logger.debug('response.request.body:', response.request.body)
     logger.debug('response.request.headers:', response.request.headers)
     logger.debug('response.status_code:', response.status_code)
+    logger.debug('response.headers:', type(response.headers))
     logger.debug('response.headers:', response.headers)
     logger.debug('response.cookies:', response.cookies.get_dict())
     logger.debug('body:', (body if type(body) is str else str(body))[0:1024])
