@@ -85,18 +85,6 @@ LOG_PATH=$OPT_LOG_DIR/web-fetch-bot-`date +%Y%m%d_%H%M%S`.log
 
 mkdir -p "$OPT_LOG_DIR"
 
-# dump options
-(
-echo "------------------------------"
-echo "LOG DIR  : $OPT_LOG_DIR"
-echo "LOG FILE : $LOG_PATH"
-echo "LIST FILE: $LIST_FILE"
-if [ 0 -ne $OPT_DRY_RUN ]; then
-  echo "DRY RUN  : true"
-fi
-echo "------------------------------"
-) | tee -a $LOG_PATH 1>&2
-
 # failback
 _date=date
 if type gdate >/dev/null 2>&1; then
@@ -217,7 +205,7 @@ function cron() {
     echo "$URL" 1>&2
     t0=$($_date +'%s.%3N')
     if [ 0 -eq $OPT_DRY_RUN ]; then
-#     python3 $ROOT_DIR/src/main.py -vv $1 2>&1
+    # python3 $ROOT_DIR/src/main.py -vv $1 2>&1
       (
         python3 $ROOT_DIR/src/main.py $OPT -vv $1 2>&1 | \
           tee /dev/stderr ) 2> >( grep "完了 " | sed -e "s/^/  /g" 1>&2 )
@@ -235,6 +223,18 @@ function cron() {
   echo "------------------------------"
 }
 
+(
+
+# dump options
+echo "------------------------------"
+echo "LOG DIR  : $OPT_LOG_DIR"
+echo "LOG FILE : $LOG_PATH"
+echo "LIST FILE: $LIST_FILE"
+if [ 0 -ne $OPT_DRY_RUN ]; then
+  echo "DRY RUN  : true"
+fi
+echo "------------------------------"
+
 # stdout -> $LOG_PATH
 # stderr -> console
 cat $LIST_FILE | grep -vE "^\s*#" | \
@@ -249,4 +249,6 @@ while read DAY MONTH DoW URL SUBDIR ; do
       cron "$URL" "$DAY" "$MONTH" "$DoW" "$SUBDIR"
     fi
   fi
-done >> $LOG_PATH
+done
+
+) 2>&1 | tee /dev/stderr | gzip -9 -c > ${LOG_PATH}.gz
